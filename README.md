@@ -30,7 +30,9 @@ All CSV cells must be filled! Instruction cells can be filled with 0 as needed.
 **Scenes**
 
 *creator: upload csv, choose dominant eye, enter ID
+
 *exp: actual expirement. flashes images and mondrains based on the uploaded csv
+
 *end: prints output log to "output_logs" dir. creates dir if not found.
 
 **Important Directories and Files**
@@ -42,19 +44,27 @@ Oculus
 Scenes
 
 *CreateLog: automatically prints out log to file after experiment ends
+
 *createMondrians: creates mondrians by adjusting the position and color of 140 circle sprites. 
+
 *fadeStatic: takes uploaded csv infomation and fades in the image to the correct eye. also switchs the mondrians to the correct eye. this is the main file that runs the experiment part.
+
 *UIManager: takes in csv and formats it into lists for each csv header. passes it to next scene with DontDestroyOnLoad.
 
 **Implemented Features**
 
 *Upload UI: takes in csv, patient ID, and dominant eye. saves info
+
 *Generate mondrians,m eliminating need for uploading pictures of mondrians. flash speed controlled by csv
+
 *randomizes trials
+
 *runs full csv file and ends once finished.
+
 *prints output log once finished
 
 **TODO**
 
 *fade in for images doesn't work, possibly because of refresh rate. Images have to slowly fade in in less than a second (changes based on csv, but this is the current testing duration time)
+
 *images need to be overlapped in VR headset. probably need to uncomment my code in the oculus folder.
