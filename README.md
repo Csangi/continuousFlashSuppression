@@ -1,7 +1,7 @@
 **Suppression Test Beta**
 
 Psychological experiment created with Unity to test image suppression using the VR.
-Commissioned by [Dr. David March] (https://psy.fsu.edu/faculty/marchd/march.dp.php) at Florida State University.
+Commissioned by Dr. David March (https://psy.fsu.edu/faculty/marchd/march.dp.php) at Florida State University.
 
 **Important Info**
 
