@@ -564,6 +564,7 @@ MonoBehaviour:
   delay: 
   order: 
   path: 
+  eye: 
   rightEye: {fileID: 0}
   leftEye: {fileID: 0}
   ID: 
