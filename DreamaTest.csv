@@ -1,4 +1,0 @@
-Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Delay,Time To Reach Opacity,Mondrian,Response Time,Up,Down,Left,Right,Answer,
-1,1,False,1,False,Instruction,1,False,instruction.png,5000,,,,,,9.883743,
-2,1,False,1,False,Trial,5,True,Doggo.png,1000,100,50,200,600,3,
-3,1,False,1,False,Trial,7,True,Jeep.png,1000,100,50,200,600,1,

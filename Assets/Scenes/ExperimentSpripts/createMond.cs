@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,47 +24,73 @@ public class createMond : MonoBehaviour
 
     public Experiment exp = Experiment.current;
     // Start is called before the first frame update
-    void Start()
-    {
-        setColorValues();
-    }
 
     public void updateMond(RawImage[] rightImgArr, RawImage[] leftImgArr)
     {
-        int whichmond = 0, i = 0, numOfMondsUsed = 0, counter = 0;
+        colors.Clear();
+        setColorValues();
+        int whichmond = 0,
+            i = 0,
+            numOfMondsUsed = 0, // this refers to the total number of mondrians used in this experiment
+            counter = 0;        //this counts the mondrians as they are being written. 
         bool endOfMonds = false;
         for (int k = 0; k < exp.Mondrians.Count(); ++k)
-        {
+        {   //here we count how many mondrians are used in the mondrian array 
             if (exp.Mondrians[k].isUsed)
                 ++numOfMondsUsed;
         }
-        makeImagesBlank(rightImgArr, leftImgArr);
+        makeImagesBlank(rightImgArr, leftImgArr);       //here we blank out all 100 mondrian images to make sure we dont draw over another mondrian
+        //here we loop through all 100 mondrian images and find the mondrians which are actually used and drawn them
+        //We also log there minimum range and Maximum range in the mondrian array
         while (i < rightImgArr.Length && !endOfMonds && counter != numOfMondsUsed)
         {
             while (!exp.Mondrians[whichmond].isUsed)
                 ++whichmond;
 
-
+            //this is logging the minimum range which this particular mondrian will be in
             exp.Mondrians[whichmond].minRange = i;
 
             for (int j = 0; j < 20; ++j, ++i)
             {
                 if (exp.Mondrians[whichmond].shape == Shape.ellipse)
-                    rightImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.rectangle)
-                    rightImgArr[i].texture = DrawRectangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawRectangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.triangle)
-                    rightImgArr[i].texture = DrawTriangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawTriangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.pixelated)
-                    rightImgArr[i].texture = DrawPixelated(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawPixelated(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.circle)
-                    rightImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.square)
-                    rightImgArr[i].texture = DrawSquare(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawSquare(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
                 else if (exp.Mondrians[whichmond].shape == Shape.mixed)
-                    rightImgArr[i].texture = DrawMixed(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                {
+                    leftImgArr[i].texture = DrawMixed(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+                    (leftImgArr[i].texture as Texture2D).Apply();
+                }
             }
             exp.Mondrians[whichmond].maxRange = i - 1;
+            //this is the maximum range which the mondrian will be in
+            //we do this so that the experiment runner actually knows where each mondrians textures are while running. 
 
             ++whichmond;
             ++counter;
@@ -199,9 +226,8 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, xradius, yradius, width, height, radius, size;
+        int x, y, xradius, yradius, width, height, size;
         Color c;
-        float rSquared;
         for (int i = 0; i < mond.density; ++i)
         {
             if (i % 4 == 0) //ellipse
@@ -233,13 +259,12 @@ public class createMond : MonoBehaviour
             {
                 c = color[Random.Range(0, color.Count)];
                 x = Random.Range(0, 225);
-                radius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2);
+                xradius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2) + 10;
                 y = Random.Range(0, 225);
-                radius = Random.Range(mond.minHeight / 2, mond.maxHeight / 2);
-                rSquared = radius * radius;
-                for (int u = x - radius; u < x + radius + 1; u++)
-                    for (int v = y - radius; v < y + radius + 1; v++)
-                        if ((x - u) * (x - u) + (y - v) * (y - v) < rSquared)
+                yradius = Random.Range(mond.minHeight / 2, mond.maxHeight / 2) + 10;
+                for (int u = x - xradius; u < x + xradius + 1; u++)
+                    for (int v = y - yradius; v < y + yradius + 1; v++)
+                        if (Mathf.Pow(v - y, 2) / (yradius * yradius) + Mathf.Pow(u - x, 2) / (xradius * xradius) < 1)
                             tex.SetPixel(u, v, c);
                 tex.Apply();
             }
@@ -279,6 +304,7 @@ public class createMond : MonoBehaviour
     //color values from https://excelatfinance.com/xlf/xlf-colors-1.php
     void setColorValues()
     {
+        int counter = 0, red = -1, green = -1, blue = -1;
         List<Color> row = new List<Color>();
         row.Add(new Color(255, 0, 0));      //red
         row.Add(new Color(0, 255, 0));      //green
@@ -288,18 +314,72 @@ public class createMond : MonoBehaviour
         row.Add(new Color(0, 255, 255));    //cyan
         colors.Add(row);
         row = new List<Color>();
-        row.Add(new Color(0, 0, 0));            //black
-        row.Add(new Color(255, 255, 255));      //white
-        row.Add(new Color(192, 192, 192));      //light gray
-        row.Add(new Color(128, 128, 128));      //grey
-        colors.Add(row);
-        row = new List<Color>();
-        row.Add(new Color(128, 0, 0));      //brown
-        row.Add(new Color(0, 128, 0));      //dark green
-        row.Add(new Color(0, 0, 128));      //dark blue
-        row.Add(new Color(128, 128, 0));    //dark yellow/gold
-        row.Add(new Color(128, 0, 128));    //dark magenta 
-        row.Add(new Color(0, 128, 128));    //dark cyan
-        colors.Add(row);
+        string palettePath = Experiment.current.inputPath;                                                //its called image path because I copied my code from the image uploader
+        Debug.Log(palettePath);
+        while (!palettePath[palettePath.Length - 1].Equals('\\'))                   //we want to remove the original file name so that we can find the directory and navigate to the correct location
+        {
+            palettePath = palettePath.Remove(palettePath.Length - 1, 1);
+        }
+        palettePath += "colorPalette.csv";
+        Debug.Log(palettePath);
+
+        if (palettePath.Length != 0)
+        {
+            using (var sr = new StreamReader(palettePath))
+            {
+                bool EOF = false;
+                while (!EOF)
+                {
+                    string data = sr.ReadLine();
+                    if (data == null)
+                    {
+                        EOF = true;
+                        break;
+                    }
+                    var values = data.Split(',');
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        Debug.Log(values.Length);
+                        Debug.Log(values[i]);
+                        if (counter > 0)
+                        {
+                            int result = 0;
+                            result = System.Int32.Parse(values[i]);
+                            Debug.Log(result);
+                            if (i == 0)
+                            {
+                                Debug.Log("do nothing");
+                            }
+                            else if (red == -1)
+                            {
+                                red = result;
+                            }
+                            else if (green == -1)
+                            {
+                                green = result;
+                            }
+                            else if (blue == -1)
+                            {
+                                blue = result;
+                            }
+                            else
+                            {
+                                row.Add(new Color(red, green, blue));
+                                red = green = blue = -1;
+                                red = result;
+                            }
+                        }
+                    }
+                    if (counter > 0)
+                    {
+                        colors.Add(row);
+                        row = new List<Color>();
+                    }
+                    counter++;
+                }
+                sr.Close();
+            }
+
+        }
     }
 }

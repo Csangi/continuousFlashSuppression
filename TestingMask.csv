@@ -1,8 +1,0 @@
-Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Delay,Time To Reach Opacity,Mondrian,Response Time,Up,Down,Left,Right,Answer,
-1,1,False,1,True,Instruction,1,False,instruction.png,5000,,,,,,5.006829,
-2,1,False,1,True,FlashMondTrial,6,True,Jeep.png,1000,100,50,200,600,5,
-3,1,False,1,True,Trial,3,True,Doggo.png,1000,100,50,200,600,1,
-4,1,False,1,True,Trial,2,True,Colors.png,1000,100,50,200,600,0,
-5,1,False,1,True,FlashMondTrial,7,True,AmongUs.png,1000,100,50,200,600,1,
-6,1,False,1,True,FlashMondTrial,5,True,Cash.png,1000,100,50,200,600,3,
-7,1,False,1,True,Trial,4,True,RedHood.png,1000,100,50,200,600,2,

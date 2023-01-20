@@ -125,7 +125,9 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 1845175856862572605, guid: 1023e199462638647b4cbc0a483ed237, type: 2}
+  - {fileID: 11400000, guid: 902e66fd03db9d648bc60327d4108468, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -760,6 +762,6 @@ PlayerSettings:
   projectName: pyschv1
   organizationId: sfhall22
   cloudEnabled: 0
-  enableNativePlatformBackendsForNewInputSystem: 0
+  enableNativePlatformBackendsForNewInputSystem: 1
   disableOldInputManagerSupport: 0
   legacyClampBlendShapeWeights: 0

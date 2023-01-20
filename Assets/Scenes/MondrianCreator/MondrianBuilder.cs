@@ -27,6 +27,8 @@ public class MondrianBuilder : MonoBehaviour
         sh = 0;
     }
 
+    //Most of the code in this section is for the input GUI
+    //--------------------------------GUI------------------------------------------
     public void changePalette(int pal)
     {
         palette = pal;
@@ -35,7 +37,6 @@ public class MondrianBuilder : MonoBehaviour
     public void changeShape(int shape)
     {
         sh = shape;
-        Debug.Log(sh);
     }
 
     public void changePix(bool pixelated)
@@ -120,8 +121,11 @@ public class MondrianBuilder : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    public void runMondrainCreator()
+    //--------------------------------------------End of input GUI for mondrians
+
+    public void runMondrianCreator()        //this simplily creates the mondrian and makes it depending on the shape
     {
+        Debug.Log("increator");
         Mondrian m = new Mondrian(palette, sh, pix, minWidth, maxWidth, minHeight, maxHeight, density);
         mondDrawn = false;
         m.printMond();
@@ -199,30 +203,37 @@ public class MondrianBuilder : MonoBehaviour
 
     public void saveMond()
     {
-        if (!savingMond)
+        if (!savingMond && mondDrawn)
         {
             savingMond = true;
-            StartCoroutine(saveMondrian());
+            StartCoroutine(saveMondrian());     //send to the mondrian saver
             savingMond = false;
+        }
+        else
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "No Mondrian was drawn.";
         }
     }
 
-    public IEnumerator saveMondrian()
+    public IEnumerator saveMondrian()       // this function will find the output path and draw the specified number of mondrians and save them
     {
         outputPath += "\\" + folderName;
-        if (!Directory.Exists(outputPath))
+        if (!Directory.Exists(outputPath))                  //if the directory DNE then create it
             Directory.CreateDirectory(outputPath);
 
-        for (int i = 0; i < mondNum; ++i)
+        for (int i = 0; i < mondNum; ++i)                                           //loop waiting for the mond to be drawn. 
         {
-            yield return new WaitForEndOfFrame();
-            byte[] byteArr = (rawImage.texture as Texture2D).EncodeToPNG();
-            System.IO.File.WriteAllBytes(outputPath + "\\" + mond + num + ".png", byteArr);
+            yield return new WaitForEndOfFrame();                                   //wait until it is drawn
+            byte[] byteArr = (rawImage.texture as Texture2D).EncodeToPNG();         //change the texture 2D to a byte Arr
+            System.IO.File.WriteAllBytes(outputPath + "\\" + mond + num + ".png", byteArr);     //and save that byte Arr to png in the specified directory
             Debug.Log(outputPath + "\\" + mond + num + ".png");
             ++num;
-            runMondrainCreator();
-            yield return new WaitUntil(() => mondDrawn);
+            runMondrianCreator();                           //draw new mondrians
+            yield return new WaitUntil(() => mondDrawn);    //wait until they are done. 
         }
+        num = 0;        //reset num for the next mondrians. 
+                        //this is how most people will expect it to run
     }
 
     void setColorValues()
