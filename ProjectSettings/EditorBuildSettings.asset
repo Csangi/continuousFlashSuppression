@@ -6,16 +6,24 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Opening.unity
+    guid: 0c42208206cb9da47b7daba177876b29
+  - enabled: 1
+    path: Assets/Scenes/MondrianTester.unity
+    guid: c0397ed2722862f46a8a6168076bc405
+  - enabled: 1
     path: Assets/Scenes/creator.unity
     guid: 1c0d3e394664f3a4bbd5c29a6faf4b4f
   - enabled: 1
+    path: Assets/Scenes/LoadingScreen.unity
+    guid: a6b405a134fc3f94096a1ad8c9c4167a
+  - enabled: 1
     path: Assets/Scenes/exp.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
-    path: Assets/Scenes/End.unity
-    guid: 627318172438c204c8cea8c40a6dd133
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 902e66fd03db9d648bc60327d4108468,
+      type: 2}
+    Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 62eaaf2dee30b874a84739907e74a3b1,
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 1023e199462638647b4cbc0a483ed237,
       type: 2}

@@ -10,7 +10,7 @@ ANY KIND, either express or implied. See the License for the specific language g
 permissions and limitations under the License.
 ************************************************************************************/
 
-#if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
+#if USING_XR_MANAGEMENT && (USING_XR_SDK_OCULUS || USING_XR_SDK_OPENXR)
 #define USING_XR_SDK
 #endif
 
@@ -18,7 +18,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.XR;
 using Node = UnityEngine.XR.XRNode;
 
 /// <summary>
@@ -102,15 +102,15 @@ public class OVRCameraRig : MonoBehaviour
 	protected readonly string rightHandAnchorName = "RightHandAnchor";
 	protected readonly string leftControllerAnchorName = "LeftControllerAnchor";
 	protected readonly string rightControllerAnchorName = "RightControllerAnchor";
-	public Camera _centerEyeCamera;
-	public Camera _leftEyeCamera;
-	public Camera _rightEyeCamera;
+	protected Camera _centerEyeCamera;
+	protected Camera _leftEyeCamera;
+	protected Camera _rightEyeCamera;
 
 #region Unity Messages
 	protected virtual void Awake()
 	{
 		_skipUpdate = true;
-		//EnsureGameObjectIntegrity();
+		EnsureGameObjectIntegrity();
 	}
 
 	protected virtual void Start()
@@ -144,7 +144,7 @@ public class OVRCameraRig : MonoBehaviour
 		if (!OVRManager.OVRManagerinitialized)
 			return;
 
-		//EnsureGameObjectIntegrity();
+		EnsureGameObjectIntegrity();
 
 		if (!Application.isPlaying)
 			return;
@@ -263,6 +263,20 @@ public class OVRCameraRig : MonoBehaviour
 			leftControllerAnchor.localRotation = leftOffsetPose.orientation;
 		}
 
+#if USING_XR_SDK
+#if UNITY_2020_3_OR_NEWER
+		if (OVRManager.instance.LateLatching)
+		{
+			XRDisplaySubsystem displaySubsystem = OVRManager.GetCurrentDisplaySubsystem();
+			if (displaySubsystem != null)
+			{
+				displaySubsystem.MarkTransformLateLatched(centerEyeAnchor.transform, XRDisplaySubsystem.LateLatchNode.Head);
+				displaySubsystem.MarkTransformLateLatched(leftHandAnchor, XRDisplaySubsystem.LateLatchNode.LeftHand);
+				displaySubsystem.MarkTransformLateLatched(rightHandAnchor, XRDisplaySubsystem.LateLatchNode.RightHand);
+			}
+		}
+#endif
+#endif
 		RaiseUpdatedAnchorsEvent();
 	}
 
@@ -291,7 +305,7 @@ public class OVRCameraRig : MonoBehaviour
 		}
 	}
 
-	/*public virtual void EnsureGameObjectIntegrity()
+	public virtual void EnsureGameObjectIntegrity()
 	{
 		bool monoscopic = OVRManager.instance != null ? OVRManager.instance.monoscopic : false;
 
@@ -388,7 +402,7 @@ public class OVRCameraRig : MonoBehaviour
 			_rightEyeCamera.enabled = (usePerEyeCameras && (!monoscopic || OVRPlugin.EyeTextureArrayEnabled));
 
 		}
-	}*/
+	}
 
 	protected virtual Transform ConfigureAnchor(Transform root, string name)
 	{
