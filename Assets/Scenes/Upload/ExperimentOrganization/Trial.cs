@@ -31,7 +31,16 @@ public class MondTrial : Item
     public int maskDelay { get; private set; }                            //delay before the image appears                      
     public int staticDelay { get; private set; } //the time it will take to reach the given opacity in ms  
     public int mond { get; private set; }
-    public MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2) : base(rand, blk, img, multi, img2)
+    public string left { get; private set; }
+    public string right { get; private set; }
+    public string up { get; private set; }
+    public string down { get; private set; }
+    public string response { get; set; }
+    public string responseTime { get; set; }
+    public bool isResponse { get; private set; }  //if the trial takes in reponse
+    public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
+    //default constructor
+    public MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -40,7 +49,13 @@ public class MondTrial : Item
         opacity = opa;
         staticDelay = stcdly;
         this.mond = mond;
-
+        left = l;
+        right = r;
+        up = u;
+        down = d;
+        isResponse = resp;
+        responseStop = stop;
+        response = responseTime = "";
     }
 
     public override void printTrial()
@@ -58,6 +73,14 @@ public class MondTrial : Item
         Debug.Log("mask delay = " + maskDelay + "\n");
         Debug.Log("static delay = " + staticDelay + "\n");
         Debug.Log("Mondrian number = " + mond + "\n");
+        Debug.Log("Response = " + isResponse + "\n");
+        if (isResponse)
+        {
+            Debug.Log("Left = " + left + "\n");
+            Debug.Log("Right = " + right + "\n");
+            Debug.Log("Up = " + up + "\n");
+            Debug.Log("Down = " + down + "\n");
+        }
         Debug.Log("---------------------end of trial print-------------------------");
     }
 }
@@ -70,9 +93,18 @@ public class FlashMondTrial : Item
     public float opacity { get; private set; }                          //% opacity to reach by the end of the trial                                                            
     public int maskDelay { get; private set; }                            //delay before the image appears                      
     public int staticDelay { get; private set; } //the time it will take to reach the given opacity in ms  
-    public int mond { get; private set; }
+    public int mond { get; private set; }           //which mond the trial uses
     public float flashPeriod { get; private set; }
-    public FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2) : base(rand, blk, img, multi, img2)
+    public string left { get; private set; }       //if the trial takes in response what are the responses
+    public string right { get; private set; }
+    public string up { get; private set; }
+    public string down { get; private set; }
+    public string response { get; set; }
+    public string responseTime { get; set; }
+    public bool isResponse { get; private set; }  //if the trial takes in reponse
+    public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
+    //default constructor
+    public FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -82,8 +114,15 @@ public class FlashMondTrial : Item
         staticDelay = stcdly;
         this.mond = mond;
         flashPeriod = flash;
+        left = l;
+        right = r;
+        up = u;
+        down = d;
+        isResponse = resp;
+        responseStop = stop;
+        response = responseTime = "";
     }
-
+    //debug print statement for error checking
     public override void printTrial()
     {
         Debug.Log("---------------------start of flash mond trial print-----------------------");
@@ -100,6 +139,14 @@ public class FlashMondTrial : Item
         Debug.Log("static delay = " + staticDelay + "\n");
         Debug.Log("Mondrian number = " + mond + "\n");
         Debug.Log("Flash Period = " + flashPeriod + "\n");
+        Debug.Log("Response = " + isResponse + "\n");
+        if (isResponse)
+        {
+            Debug.Log("Left = " + left + "\n");
+            Debug.Log("Right = " + right + "\n");
+            Debug.Log("Up = " + up + "\n");
+            Debug.Log("Down = " + down + "\n");
+        }
         Debug.Log("---------------------end of trial print-------------------------");
     }
 }
@@ -115,7 +162,16 @@ public class MaskTrial : Item
     public int staticDelay { get; private set; } //the time it will take to reach the given opacity in ms  
     public string mask { get; set; }
     public string maskPath { get; set; }
-    public MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2) : base(rand, blk, img, multi, img2)
+    public string left { get; private set; }
+    public string right { get; private set; }
+    public string up { get; private set; }
+    public string down { get; private set; }
+    public string response { get; set; }
+    public string responseTime { get; set; }
+    public bool isResponse { get; private set; }  //if the trial takes in reponse
+    public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
+    //default constructor
+    public MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -126,6 +182,13 @@ public class MaskTrial : Item
         this.mask = mask;
         maskPath = "";
         flashPeriod = flash;
+        left = l;
+        right = r;
+        up = u;
+        down = d;
+        isResponse = resp;
+        responseStop = stop;
+        response = responseTime = "";
     }
 
     public override void printTrial()
@@ -144,6 +207,14 @@ public class MaskTrial : Item
         Debug.Log("static delay = " + staticDelay + "\n");
         Debug.Log("Mask name = " + mask + "\n");
         Debug.Log("Flash period = " + flashPeriod + "\n");
+        Debug.Log("Response = " + isResponse + "\n");
+        if (isResponse)
+        {
+            Debug.Log("Left = " + left + "\n");
+            Debug.Log("Right = " + right + "\n");
+            Debug.Log("Up = " + up + "\n");
+            Debug.Log("Down = " + down + "\n");
+        }
         Debug.Log("---------------------end of trial print-------------------------");
     }
 }

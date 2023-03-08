@@ -19,6 +19,7 @@ public class MondrianBuilder : MonoBehaviour
     public bool savingMond, mondDrawn;
     public string outputPath = "";
     public string folderName = "";
+    public Dropdown paletteDropdown;
 
     void Start()
     {
@@ -252,13 +253,79 @@ public class MondrianBuilder : MonoBehaviour
         row.Add(new Color(192, 192, 192));      //light gray
         row.Add(new Color(128, 128, 128));      //grey
         colors.Add(row);
-        row = new List<Color>();
-        row.Add(new Color(128, 0, 0));      //brown
-        row.Add(new Color(0, 128, 0));      //dark green
-        row.Add(new Color(0, 0, 128));      //dark blue
-        row.Add(new Color(128, 128, 0));    //dark yellow/gold
-        row.Add(new Color(128, 0, 128));    //dark magenta 
-        row.Add(new Color(0, 128, 128));    //dark cyan
-        colors.Add(row);
+    }
+
+
+    public void uploadPalette(string palettePath)
+    {
+        int counter = 0, red = -1, green = -1, blue = -1;
+        List<Color> row = new List<Color>();
+        Debug.Log(palettePath);
+
+        if (palettePath.Length != 0 && File.Exists(palettePath))        //If the file exists 
+        {
+            using (var sr = new StreamReader(palettePath))              //open up a stream reader on the path
+            {
+                bool EOF = false;
+                while (!EOF)                                            //read in line by line
+                {
+                    string data = sr.ReadLine();
+                    if (data == null)
+                    {
+                        EOF = true;
+                        break;
+                    }
+                    var values = data.Split(',');                       //input into an array
+                    for (int i = 0; i < values.Length; i++)             //loop through each line with a line being its own palette
+                    {
+                        Debug.Log(values.Length);
+                        Debug.Log(values[i]);
+                        if (counter > 0)
+                        {
+                            int result = 0;
+                            result = System.Int32.Parse(values[i]);
+                            Debug.Log(result);
+                            if (i == 0)                                 //ignore first column
+                            {
+                                Debug.Log("do nothing");
+                            }
+                            else if (red == -1)                         //the order goes r g b so everytime we loop through a line we will populate accordingly
+                            {
+                                red = result;
+                            }
+                            else if (green == -1)
+                            {
+                                green = result;
+                            }
+                            else if (blue == -1)
+                            {
+                                blue = result;
+                            }
+                            else
+                            {                                           //once these are all filled add teh color and start again
+                                row.Add(new Color(red, green, blue));
+                                red = green = blue = -1;
+                                red = result;
+                            }
+                        }
+                    }
+                    if (counter > 0)            //ignore first row
+                    {
+                        colors.Add(row);
+                        row = new List<Color>();
+                        paletteDropdown.options.Add(new Dropdown.OptionData("input palette #" + counter));
+                    }               //add the drop down option
+                    counter++;
+                }
+                sr.Close();
+            }
+            errorText.GetComponent<Text>().color = Color.white;
+            errorText.GetComponent<Text>().text = "";
+        }
+        else
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Could not find palette file. ";
+        }
     }
 }

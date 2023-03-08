@@ -116,21 +116,21 @@ public class Experiment                                                 //Final 
     public void randomizeConditions()
     {
         int x, holder;
-
-        for (int i = 0; i < numberOfConditions; i++)                //loop through the list of blocks                               
-        {
-            conditions[i].randomizeBlocks();
-            if (conditions[i].random)
+        if (numberOfConditions > 1)
+            for (int i = 0; i < numberOfConditions; i++)                //loop through the list of blocks                               
             {
-                do
+                conditions[i].randomizeBlocks();
+                if (conditions[i].random)
                 {
-                    x = Random.Range(0, numberOfConditions - 1);    //use x as a random variable                                    
-                } while (!conditions[x].random);                    //while the random block is a block that can be randomized      
-                holder = index[i];                             //have the holder hold the value of the index of block[i]        
-                index[i] = index[x];                          //swap i and x                                                    
-                index[x] = holder;                             //swap x and i                                                   
+                    do
+                    {
+                        x = Random.Range(0, numberOfConditions - 1);    //use x as a random variable                                    
+                    } while (!conditions[x].random);                    //while the random block is a block that can be randomized      
+                    holder = index[i];                             //have the holder hold the value of the index of block[i]        
+                    index[i] = index[x];                          //swap i and x                                                    
+                    index[x] = holder;                             //swap x and i                                                   
+                }
             }
-        }
     }
 }
 

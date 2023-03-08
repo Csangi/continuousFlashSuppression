@@ -38,20 +38,20 @@ public class Condition
     {
 
         int x, holder;
-
-        for (int i = 0; i < numberOfBlocks; i++)                //loop through the list of blocks                              
-        {
-            blocks[i].randomizeTrials();
-            if (blocks[i].random)
+        if (numberOfBlocks > 1)
+            for (int i = 0; i < numberOfBlocks; i++)                //loop through the list of blocks                              
             {
-                do
+                blocks[i].randomizeTrials();
+                if (blocks[i].random)
                 {
-                    x = Random.Range(0, numberOfBlocks - 1);    //use x as a random variable                                    
-                } while (!blocks[x].random);                    //while the random block is a block that can be randomized      
-                holder = index[i];                             //have the holder hold the value of the index of block[i]        
-                index[i] = index[x];                          //swap i and x                                                    
-                index[x] = holder;                             //swap x and i                                                   
+                    do
+                    {
+                        x = Random.Range(0, numberOfBlocks - 1);    //use x as a random variable                                    
+                    } while (!blocks[x].random);                    //while the random block is a block that can be randomized      
+                    holder = index[i];                             //have the holder hold the value of the index of block[i]        
+                    index[i] = index[x];                          //swap i and x                                                    
+                    index[x] = holder;                             //swap x and i                                                   
+                }
             }
-        }
     }
 }

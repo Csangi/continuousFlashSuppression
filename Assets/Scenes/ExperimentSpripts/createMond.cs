@@ -22,6 +22,10 @@ public class createMond : MonoBehaviour
     public int palette;
     List<List<Color>> colors = new List<List<Color>>();
 
+    //used for loading screen
+    public static int numOfMonds = 1;
+    public static int currentMond = 0;
+
     public Experiment exp = Experiment.current;
     // Start is called before the first frame update
 
@@ -39,6 +43,7 @@ public class createMond : MonoBehaviour
             if (exp.Mondrians[k].isUsed)
                 ++numOfMondsUsed;
         }
+        numOfMonds = numOfMondsUsed * 20;
         makeImagesBlank(rightImgArr, leftImgArr);       //here we blank out all 100 mondrian images to make sure we dont draw over another mondrian
         //here we loop through all 100 mondrian images and find the mondrians which are actually used and drawn them
         //We also log there minimum range and Maximum range in the mondrian array
@@ -52,6 +57,7 @@ public class createMond : MonoBehaviour
 
             for (int j = 0; j < 20; ++j, ++i)
             {
+                currentMond++;
                 if (exp.Mondrians[whichmond].shape == Shape.ellipse)
                 {
                     leftImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
@@ -323,21 +329,21 @@ public class createMond : MonoBehaviour
         palettePath += "colorPalette.csv";
         Debug.Log(palettePath);
 
-        if (palettePath.Length != 0)
+        if (palettePath.Length != 0 && File.Exists(palettePath))
         {
-            using (var sr = new StreamReader(palettePath))
+            using (var sr = new StreamReader(palettePath))          //open up a stream reader on the path
             {
                 bool EOF = false;
                 while (!EOF)
                 {
-                    string data = sr.ReadLine();
+                    string data = sr.ReadLine();                //read in line by line
                     if (data == null)
                     {
                         EOF = true;
                         break;
                     }
-                    var values = data.Split(',');
-                    for (int i = 0; i < values.Length; i++)
+                    var values = data.Split(',');               //input into an array
+                    for (int i = 0; i < values.Length; i++)     //loop through each line with a line being its own palette
                     {
                         Debug.Log(values.Length);
                         Debug.Log(values[i]);
@@ -346,11 +352,11 @@ public class createMond : MonoBehaviour
                             int result = 0;
                             result = System.Int32.Parse(values[i]);
                             Debug.Log(result);
-                            if (i == 0)
+                            if (i == 0)                         //ignore first column
                             {
                                 Debug.Log("do nothing");
                             }
-                            else if (red == -1)
+                            else if (red == -1)                 //the order goes r g b so everytime we loop through a line we will populate accordingly
                             {
                                 red = result;
                             }
@@ -363,14 +369,14 @@ public class createMond : MonoBehaviour
                                 blue = result;
                             }
                             else
-                            {
+                            {                                   //once these are all filled add teh color and start again
                                 row.Add(new Color(red, green, blue));
                                 red = green = blue = -1;
                                 red = result;
                             }
                         }
                     }
-                    if (counter > 0)
+                    if (counter > 0)                //ignore first row
                     {
                         colors.Add(row);
                         row = new List<Color>();
