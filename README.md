@@ -1,70 +1,89 @@
-**Suppression Test Beta**
+**Suppression Test Alpha**
 
 Psychological experiment created with Unity to test image suppression using the VR.
 Commissioned by Dr. David March (https://psy.fsu.edu/faculty/marchd/march.dp.php) at Florida State University.
 
 **Important Info**
 
-The images used in the expirement must be stored in the same location as the loaded csv. The output logs will be stored within this directory.
-
-
-One trial is the length of one image's screen time.
-
-
-CSV file order:
-1. trial_type: 1 = instruction, 2 = image
-2. block: for randomization within blocks
-3. block_rand: for randomazation within blocks
-4. trial: trial number
-5. trial_rand:for randomazation within blocks
-6. duration (ms): length of trial
-7. flash duration: how quickly mondrians flash
-8. image: file name of image
-9. opacity (%): max opacity the image will reach
-10. delay (ms): time within a trial for the image to start fading in. if its 200ms, then the image starts fading in at 200ms.
-11. time to reach opacity (ms): time it takes for the image to reach the defined max opacity.
-
+Use 1 for true and 0 for false. 
 
 All CSV cells must be filled! Instruction cells can be filled with 0 as needed.
 
-**Scenes**
+CSV file order:
 
-*creator: upload csv, choose dominant eye, enter ID
+!!  First header line will be ignored  !!
 
-*exp: actual expirement. flashes images and mondrains based on the uploaded csv
+  1. Condition
+  2. Condition Random
+  3. Block
+  4. Block Random
+  5. Trial type
+  6. Trial
+  7. Trial Random
+  8. Image
+  9. Duration(ms)
+  10. Flash Duration(ms)
+  11. Opacity(%)
+  12. Mask Delay(ms)
+  13. Static Delay(ms)
+  14. Masks (optional)
+    *for response input*
+  15. UP (optional)
+  16. DOWN (optional)
+  17. Left (optional)
+  18. Right (optional)
+  19. Flash Period(ms) (optional)
 
-*end: prints output log to "output_logs" dir. creates dir if not found.
+*Uploading images*
 
-**Important Directories and Files**
+!!  All images must be in a folder named "Static" in the same directory as the uploaded experiement file  !!
 
-Oculus
+The images used in the expirement must be uploaded in the csv. The program does not provide any images to the user aside from pregenerated mondrians. 
 
-*assest/Oculus/VR/Scripts/OVRCameraRig.cs: commented out function that auto adjusted left/center/right cameras.
+  In the csv the user will state the name of a image file which they wish to use 
+  or 
+  They can list a text file containing the names of multiple image files, which should be found in the same "Static" folder, predesignated with a symbol refering to the type of input shown below. (no spaces)
+  
+    *Randomization types*
+      # = pull from the list in the order it’s presented
+      $ = pull randomly from the list without replacement
+      & = pull randomly from the list with replacement
+  
+*Creating Mondrians* (optional)
 
-Scenes
+!!  Mond.csv must be the name of your file and must be in the same directory as the originally uploaded csv  !!
 
-*CreateLog: automatically prints out log to file after experiment ends
-
-*createMondrians: creates mondrians by adjusting the position and color of 140 circle sprites. 
-
-*fadeStatic: takes uploaded csv infomation and fades in the image to the correct eye. also switchs the mondrians to the correct eye. this is the main file that runs the experiment part.
-
-*UIManager: takes in csv and formats it into lists for each csv header. passes it to next scene with DontDestroyOnLoad.
-
-**Implemented Features**
-
-*Upload UI: takes in csv, patient ID, and dominant eye. saves info
-
-*Generate mondrians,m eliminating need for uploading pictures of mondrians. flash speed controlled by csv
-
-*randomizes trials
-
-*runs full csv file and ends once finished.
-
-*prints output log once finished
-
-**TODO**
-
-*fade in for images doesn't work, possibly because of refresh rate. Images have to slowly fade in in less than a second (changes based on csv, but this is the current testing duration time)
-
-*images need to be overlapped in VR headset. probably need to uncomment my code in the oculus folder.
+  You can use the mondrian creator in the program to get a feel for your mondrian.
+  Once you have found the mondrian or mondrians you wish to use add them to the mond csv and specify them in the Mask column of your upload
+  
+    -Mond.csv
+    
+    !!  First row is ignored  !!
+    
+      CSV file order:
+      
+      1. Number Mondrian
+      2. Palette
+      3. Shape
+        - 0 : Ellipse
+        - 1 : Rectangle
+        - 2 : Triangle (triangle not currently working)
+        - 3 : Pixelated
+        - 4 : Circle
+        - 5 : Square
+        - 6 : Mixed
+      4. Pixelated
+      5. Minimum width
+      6. Maximum width
+      7. Minimum height
+      8. Maximum height
+      9. Density
+  
+  *Uploading Color Palettes* (optional)
+  
+  !!  colorPalette.csv must be the name of your file and must be in the same directory as the originally uploaded csv  !!
+  
+    If you wish to use your own color palettes for your mondrians you can upload them in the colorPalette csv
+     -colorPalette.csv
+      In colorPalette.csv you will type the RGB color values of your colors sequentially in a row per every palette. 
+      The header row will be ignored and the first column is also ignored for numbering. Every row is a new palette and every 3 columns is a color. 
