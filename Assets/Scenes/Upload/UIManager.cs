@@ -20,10 +20,10 @@ public class UIManager : MonoBehaviour
     public GameObject dominantEyeError;
 
     //to get the csv file destination
-    public string path;
+    private string path;
 
     //the mondrian csv path
-    public string mondPath;
+    private string mondPath;
 
     //Experiment object system
     public Experiment experiment = Experiment.current; //= Experiment.current;
@@ -31,31 +31,121 @@ public class UIManager : MonoBehaviour
     //test image
     public RawImage rawImage;
 
-    //user ID
-    public string conditionOrder;
-
     private bool uploadSuccessfull;
 
+    private bool hasStarted;
+
     public GameObject idInputfield;
-    public GameObject pathInputfield;
+    public GameObject outputPathInputfield;
     public GameObject conditionOrderInputfield;
     public GameObject idTextDisplay;
     public GameObject conditionOrderTextDisplay;
     public GameObject uploadErrorText;
+    public GameObject outputPathErrorText;
+
+    private void starting()
+    {
+        Debug.Log("Waiting HERE AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        if (experiment.hasUploaded)
+            returnedFromExp();
+
+        if (experiment.args.Length > 1 && !experiment.hasUploaded)
+        {
+            Debug.Log("Uploading Args");
+            experiment.ID = experiment.args[2];
+
+            if (experiment.args[3] == "right")
+            {
+                experiment.right = true;
+                Debug.Log("Eye is set to: right");
+                //SR.WriteLine("Eye is set to: right");
+            }
+            else if (experiment.args[3] == "left")
+            {
+                experiment.left = true;
+                Debug.Log("Eye is set to: left");
+                //SR.WriteLine("Eye is set to: left");
+            }
+            else
+            {
+                experiment.right = true;
+                Debug.Log("Eye not entered: defaulting to right");
+                //SR.WriteLine("Eye not entered: defaulting to right");
+            }
+
+            if (experiment.args.Length >= 5)
+            {
+                if (Directory.Exists(experiment.args[4]))
+                    experiment.outputPath = experiment.args[4];
+            }
+
+            uploadSuccessfull = true;
+            int numberBlock = 0, numberCondition = 0;
+            //set path to empty string
+            path = "";
+            mondPath = "";
+
+            //this actually opens the filepanel to allow the user to choose a file. the last variable is the file type - limiting to csv for now
+            try
+            {
+                if (experiment.hasUploaded)                     //if the user has already uploaded an experiment we want to clear that out so we can
+                    experiment.clearExperiment();               //enter the new data as it is most likely that ther are reuploading becuase of an error
+                experiment.addCondition(new Condition(true));                       //no matter what we will still need to add the first condition and block
+                experiment.conditions[numberCondition].addBlocks(new Block(false));
+                if (experiment.Mondrians.Count() == 0)
+                    experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
+                experiment.mondsHaveBeenDrawn = false;
+                //convert string[] into normal string
+                uploadExperiment(experiment.args[1], numberCondition, numberBlock);
+            }
+            catch (IOException)
+            {
+                uploadErrorText.GetComponent<Text>().color = Color.red;
+                uploadErrorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+                uploadSuccessfull = false;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                uploadErrorText.GetComponent<Text>().color = Color.red;
+                uploadErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+                uploadSuccessfull = false;
+            }
+            catch (NullReferenceException)
+            {
+                uploadErrorText.GetComponent<Text>().color = Color.red;
+                uploadErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+                uploadSuccessfull = false;
+            }
+
+            if (experiment.args.Length == 6)
+            {
+                changeConditionOrder(experiment.args[5]);
+            }
+
+            if (uploadSuccessfull)
+            {
+                Experiment.current.sceneToBeLoaded = 4;
+                SceneManager.LoadScene(3);
+            }
+
+            returnedFromExp();
+            Debug.Log("Was the upload a success?: " + uploadSuccessfull);
+        }
+
+    }
 
     public void Start()
     {
-        if (experiment.hasUploaded)
-            returnedFromExp();
+        starting();
     }
 
-    public void returnedFromExp()
+    private void returnedFromExp()
     {
         if (experiment.successfulUpload)
         {
+            uploadSuccessfull = true;
             uploadErrorText.GetComponent<Text>().color = Color.white;
             uploadErrorText.GetComponent<Text>().text = "Upload Successfull";
-            uploadSuccessfull = true;
         }
 
         if (experiment.right)                         //if only the right eye is on 
@@ -71,13 +161,24 @@ public class UIManager : MonoBehaviour
             dominantEyeError.GetComponent<Text>().text = "Left eye dominance is " + experiment.left;
         }
 
+        if (experiment.outputPath != string.Empty)
+            if (Directory.Exists(experiment.outputPath))
+            {
+                outputPathErrorText.GetComponent<Text>().color = Color.white;
+                outputPathErrorText.GetComponent<Text>().text = experiment.outputPath;
+            }
+            else
+            {
+                outputPathErrorText.GetComponent<Text>().color = Color.red;
+                outputPathErrorText.GetComponent<Text>().text = "Could not find directory";
+            }
+
         if (!String.IsNullOrEmpty(experiment.ID))
         {
-            idTextDisplay.GetComponent<Text>().fontSize = 20;
             idTextDisplay.GetComponent<Text>().color = Color.white;
             idTextDisplay.GetComponent<Text>().text = experiment.ID;
         }
-        experiment.printExperiment();
+        //experiment.printExperiment();
     }
 
     //---------------------------------------------------Upload caller------------------------------------------------------------------------------
@@ -88,6 +189,7 @@ public class UIManager : MonoBehaviour
         int numberBlock = 0, numberCondition = 0;
         //set path to empty string
         path = "";
+        string CSVpath = "";
         mondPath = "";
         string[] holderPath;
 
@@ -99,9 +201,15 @@ public class UIManager : MonoBehaviour
                 experiment.clearExperiment();               //enter the new data as it is most likely that ther are reuploading becuase of an error
             experiment.addCondition(new Condition(true));                       //no matter what we will still need to add the first condition and block
             experiment.conditions[numberCondition].addBlocks(new Block(false));
-            experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
+            if (experiment.Mondrians.Count() == 0)
+                experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
             experiment.mondsHaveBeenDrawn = false;
-            uploadExperiment(holderPath, numberCondition, numberBlock);
+            //convert string[] into normal string
+            for (int i = 0; i < holderPath.Length; i++)
+                CSVpath += holderPath[i];
+            uploadExperiment(CSVpath, numberCondition, numberBlock);
+            uploadErrorText.GetComponent<Text>().text = "Upload Successfull";
+            uploadErrorText.GetComponent<Text>().color = Color.white;
         }
         catch (IOException)
         {
@@ -124,7 +232,7 @@ public class UIManager : MonoBehaviour
     }
 
     //---------------------------------------------------Experiment Uploader-------------------------------------------------------------------------------
-    public void uploadExperiment(String[] holderPath, int numberCondition, int numberBlock)
+    private void uploadExperiment(string holderPath, int numberCondition, int numberBlock)
     {
         string up = "up", down = "down", left = "left", right = "right";
         int mond = 0;
@@ -143,10 +251,8 @@ public class UIManager : MonoBehaviour
         int flashing = 0;          //the time the flashing image is off the screen
         string img2 = "";
         bool responseStop = true;
-        //convert string[] into normal string
-        for (int i = 0; i < holderPath.Length; i++)
-            path += holderPath[i];
 
+        path = holderPath;
         Debug.Log(path);
         experiment.inputPath = path;
         int counter = 0;
@@ -436,8 +542,8 @@ public class UIManager : MonoBehaviour
 
             experiment.hasUploaded = true;          //set this to true so if there is an error and the file needs to be reuploaded the program will know to clear it beforehand
             experiment.randomizeConditions();       //randomize everything, with be randomized many more times but this is mostly just for checking 
-            experiment.printExperiment();           //print to the debug screen.
             uploadImages();                    //run the image upload
+            experiment.printExperiment();           //print to the debug screen.
             Debug.Log("uploaded images");
 
             uploadMultiStims();
@@ -450,15 +556,13 @@ public class UIManager : MonoBehaviour
 
             if (uploadSuccessfull)
             {
-                uploadErrorText.GetComponent<Text>().color = Color.white;
-                uploadErrorText.GetComponent<Text>().text = "Upload Successfull";
                 experiment.successfulUpload = true;
             }
         }
         else
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
-            uploadErrorText.GetComponent<Text>().text = "Something was really wrong with the path which was uploaded, honestly I never got this error so props to you. ";
+            uploadErrorText.GetComponent<Text>().text = "Something was  wrong with the path which was uploaded. ";
             uploadSuccessfull = false;
         }
     }
@@ -494,7 +598,7 @@ public class UIManager : MonoBehaviour
     }
 
     //-------------------------------------------------------Mondrian reader----------------------------------------------------------------------
-    public void readMondrians()     //exact logic from previous upload 
+    private void readMondrians()     //exact logic from previous upload 
     {
         Debug.Log(mondPath);
         int counter = 0, palette = 0, shape = 0, minW = 0, maxW = 0, minH = 0, maxH = 0, Density = 0;
@@ -568,7 +672,7 @@ public class UIManager : MonoBehaviour
     //This code is really complex, the idea was so that the user could upload a file with a symbol which corresponds to the type of randomization that the images in that file would
     //receive. Also the user could also upload just an image name making the logic much more confusing and that much deeper. If you are reading this good luck. This code is also optimized 
     //to take in the mask images, so fuck me I guess. 
-    public void uploadImages()
+    private void uploadImages()
     {
         bool successfulRead = false;                        //essentially we will remove from the trialsToBeRandomized array and repopulate instead of the imageArr
         List<int> trialsToBeRandomized = new List<int>();   //this will save the trial index of the trials that will need images grabbed from the text file
@@ -583,6 +687,7 @@ public class UIManager : MonoBehaviour
         {
             imagePath = imagePath.Remove(imagePath.Length - 1, 1);
         }
+        experiment.directory = imagePath;
         Debug.Log(imagePath);
         imagePath += "Stimuli\\";                           //all images will be in the same directory in a file named stimuli
         holderImagePath = imagePath;                                                                //save the image path somewhere else as imagepath will be manipulated throughout the algorthem 
@@ -712,7 +817,7 @@ public class UIManager : MonoBehaviour
     //-----------------------------------------------------------Mask uploader (also sorry)--------------------------------------------------------------------------------------------------------
     //basically the same logic as the image uploader except with a lot more checking to make sure the trial is a mask trial
     //to take in the mask images, so fuck me I guess. 
-    public void uploadMasks()
+    private void uploadMasks()
     {
         bool successfulRead = false;                        //essentially we will remove from the trialsToBeRandomized array and repopulate instead of the imageArr
         List<int> trialsToBeRandomized = new List<int>();   //this will save the trial index of the trials that will need images grabbed from the text file
@@ -873,7 +978,7 @@ public class UIManager : MonoBehaviour
 
 
     //-------------------------------------------------------------Multi Stim Mask Trials-------------------------------------------------------------------
-    public void uploadMultiStims()
+    private void uploadMultiStims()
     {
         bool successfulRead = false;                        //essentially we will remove from the trialsToBeRandomized array and repopulate instead of the imageArr
         List<int> trialsToBeRandomized = new List<int>();   //this will save the trial index of the trials that will need images grabbed from the text file
@@ -1027,9 +1132,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void inputConditionOrder()
+    {
+        changeConditionOrder(conditionOrderInputfield.GetComponent<Text>().text);
+    }
 
     //-------------------------------------------------------Changing order of the conditions---------------------------------------------------------------
-    public void inputConditionOrder()                   //this function is for changing the order of conditions
+    private void changeConditionOrder(string conditionOrder)                   //this function is for changing the order of conditions
     {
         if (!uploadSuccessfull)
         {
@@ -1039,7 +1148,6 @@ public class UIManager : MonoBehaviour
         else
         {
             List<int> numbers = new List<int>();
-            conditionOrder = conditionOrderInputfield.GetComponent<Text>().text;
             int integer = 0, x = 0, y = 0;
             bool highNumberInput = false;
             StringBuilder sb = new StringBuilder();
@@ -1127,7 +1235,6 @@ public class UIManager : MonoBehaviour
     public void inputID()
     {
         experiment.ID = idInputfield.GetComponent<Text>().text;
-        idTextDisplay.GetComponent<Text>().fontSize = 20;
         idTextDisplay.GetComponent<Text>().color = Color.white;
         idTextDisplay.GetComponent<Text>().text = experiment.ID;
     }
@@ -1135,8 +1242,18 @@ public class UIManager : MonoBehaviour
     //---------------------------------------------------Path Input--------------------------------------------------------
     public void inputPath()
     {
-        experiment.path = pathInputfield.GetComponent<Text>().text;
-        Debug.Log(experiment.path);
+        Debug.Log(outputPathInputfield.GetComponent<Text>().text);
+        if (Directory.Exists(outputPathInputfield.GetComponent<Text>().text))
+        {
+            experiment.outputPath = outputPathInputfield.GetComponent<Text>().text;
+            outputPathErrorText.GetComponent<Text>().color = Color.white;
+            outputPathErrorText.GetComponent<Text>().text = experiment.outputPath;
+        }
+        else
+        {
+            outputPathErrorText.GetComponent<Text>().color = Color.red;
+            outputPathErrorText.GetComponent<Text>().text = "Could not find directory";
+        }
     }
 
     //--------------------------------------------------Dominant eye setter------------------------------------------------

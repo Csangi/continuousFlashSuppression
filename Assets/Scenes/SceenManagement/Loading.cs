@@ -13,20 +13,14 @@ public class Loading : MonoBehaviour
         StartCoroutine(LoadAsyncOperation());
     }
 
-    private void Awake()
-    {
-        progress.fillAmount = (float)createMond.currentMond / (float)createMond.numOfMonds;
-    }
     IEnumerator LoadAsyncOperation()
     {
         AsyncOperation gamelevel = SceneManager.LoadSceneAsync(Experiment.current.sceneToBeLoaded);
-        while (gamelevel.progress < 1)
+        while (!gamelevel.isDone)
         {
-            Debug.Log(gamelevel.progress);
             progress.fillAmount = gamelevel.progress;
-            yield return new WaitForSecondsRealtime(1);
+            yield return null;
         }
-        createMond.currentMond = 0;
     }
 
 }
