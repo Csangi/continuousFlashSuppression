@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 //-------------------------------------------------------------Experiment Class------------------------------------------------------------------------------------------------
@@ -15,9 +16,12 @@ public class Experiment                                                 //Final 
     public bool mondsHaveBeenDrawn;                 //if the mondrians have been drawn yet
     public int sceneToBeLoaded;                     //the next scene that will be loaded
     public string path;                             //output path which is uploaded with the experiment
+    public string directory;                        //directory where the csv came from
     public string inputPath;                        //path where the original csv was uploaded from
     public int count;                               //the number of trials
     public string palettePath;                      //the path of the palette
+    public string outputPath;
+    public string[] args;
     public static Experiment current
     {
         get
@@ -47,6 +51,9 @@ public class Experiment                                                 //Final 
         path = "";
         inputPath = "";
         count = 0;
+        outputPath = "";
+        directory = "";
+        args = Array.Empty<string>();
     }
     public void addCondition(Condition C)                               //adding a new condition to the main array of conditions                                                            
     {                                                                   //                                                                                                                  
@@ -124,7 +131,7 @@ public class Experiment                                                 //Final 
                 {
                     do
                     {
-                        x = Random.Range(0, numberOfConditions - 1);    //use x as a random variable                                    
+                        x = UnityEngine.Random.Range(0, numberOfConditions - 1);    //use x as a random variable                                    
                     } while (!conditions[x].random);                    //while the random block is a block that can be randomized      
                     holder = index[i];                             //have the holder hold the value of the index of block[i]        
                     index[i] = index[x];                          //swap i and x                                                    

@@ -255,6 +255,36 @@ public class MondrianBuilder : MonoBehaviour
         colors.Add(row);
     }
 
+    public void uploadButton()
+    {
+        string[] holderPath;
+        string path = "";
+        try
+        {
+            holderPath = SFB.StandaloneFileBrowser.OpenFilePanel("Open File", "", "csv", true);
+            foreach (var i in holderPath)
+                path += i;
+            uploadPalette(path);
+        }
+        catch (IOException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+        }
+        catch (IndexOutOfRangeException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+        }
+        catch (NullReferenceException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+        }
+    }
+
+
+
 
     public void uploadPalette(string palettePath)
     {

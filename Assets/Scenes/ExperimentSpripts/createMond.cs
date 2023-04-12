@@ -57,42 +57,7 @@ public class createMond : MonoBehaviour
 
             for (int j = 0; j < 20; ++j, ++i)
             {
-                currentMond++;
-                if (exp.Mondrians[whichmond].shape == Shape.ellipse)
-                {
-                    leftImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.rectangle)
-                {
-                    leftImgArr[i].texture = DrawRectangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.triangle)
-                {
-                    leftImgArr[i].texture = DrawTriangle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.pixelated)
-                {
-                    leftImgArr[i].texture = DrawPixelated(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.circle)
-                {
-                    leftImgArr[i].texture = DrawCircle(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.square)
-                {
-                    leftImgArr[i].texture = DrawSquare(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
-                else if (exp.Mondrians[whichmond].shape == Shape.mixed)
-                {
-                    leftImgArr[i].texture = DrawMixed(rightImgArr[i].texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
-                    (leftImgArr[i].texture as Texture2D).Apply();
-                }
+                mondTask(whichmond, rightImgArr[i], leftImgArr[i]);
             }
             exp.Mondrians[whichmond].maxRange = i - 1;
             //this is the maximum range which the mondrian will be in
@@ -103,6 +68,45 @@ public class createMond : MonoBehaviour
         }
         exp.mondsHaveBeenDrawn = true;
         exp.printMondrians();
+    }
+
+    public void mondTask(int whichmond, RawImage rightImg, RawImage leftImg)
+    {
+        if (exp.Mondrians[whichmond].shape == Shape.ellipse)
+        {
+            leftImg.texture = DrawEllipse(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.rectangle)
+        {
+            leftImg.texture = DrawRectangle(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.triangle)
+        {
+            leftImg.texture = DrawTriangle(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.pixelated)
+        {
+            leftImg.texture = DrawPixelated(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.circle)
+        {
+            leftImg.texture = DrawCircle(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.square)
+        {
+            leftImg.texture = DrawSquare(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
+        else if (exp.Mondrians[whichmond].shape == Shape.mixed)
+        {
+            leftImg.texture = DrawMixed(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            (leftImg.texture as Texture2D).Apply();
+        }
     }
 
     //very inspired from https://stackoverflow.com/questions/30410317/how-to-draw-circle-on-texture-in-unity/56616769

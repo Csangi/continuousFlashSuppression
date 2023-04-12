@@ -304,6 +304,8 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 14826}
     - Class: 114
+      Script: {instanceID: 15432}
+    - Class: 114
       Script: {instanceID: 15464}
     - Class: 114
       Script: {instanceID: 15508}
@@ -1394,7 +1396,7 @@ ScriptsOnlyBuild:
     className: OVRMesh
   - hash:
       serializedVersion: 2
-      Hash: 7985e0eff1904800d3b2799074419f87
+      Hash: 89bd6ac837157b33f8a60c0d6fc0c95f
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: UIManager
@@ -2312,7 +2314,7 @@ ScriptsOnlyBuild:
     className: HIDDescriptorWindow
   - hash:
       serializedVersion: 2
-      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+      Hash: 9c9aecb63b5d67a6b26dccf8337ed13b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Opening
@@ -3817,4 +3819,4 @@ ScriptsOnlyBuild:
   - Assets/Scenes/creator.unity
   - Assets/Scenes/LoadingScreen.unity
   - Assets/Scenes/exp.unity
-  playerPath: C:/Users/csang/Desktop/SuppresionBuilds/Suppresion Test.exe
+  playerPath: C:/Users/csang/Desktop/CFSVRBuild/CFSVR.exe

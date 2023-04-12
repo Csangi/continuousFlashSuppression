@@ -69,6 +69,7 @@ public class ExperimentRunner : MonoBehaviour
         ID = Experiment.current.ID;                                                                                                     //grabbing id string for the output csv 
         exp.randomizeConditions();                                                                                                      //randomizing the experiment incase user returns and doesnt upload a new csv
         Debug.Log("number of conditions: " + exp.numberOfConditions);
+        exp.printExperiment();
         exit = false;
     }
 
@@ -394,24 +395,29 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
-        int holder = 0, x = 0; //holds the last index in the array that is currently active
+        int holder = 0, x = 0;   //holds the last index in the array that is currently active
         float waitingPeriod = (float)T.flashDuration / 1000;        //the time between each waiting
         response = false;        //set the responses and which arrow to false 
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
-        Debug.Log("running a trial");
         if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
         {                                               //not increase throughout
             changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
             iStaticDelay = numOfIt + 1;
         }
+        Debug.Log("running a trial");
+        Debug.Log("opacity increase: " + opacityIncrease);
+        Debug.Log("waiting period: " + waitingPeriod);
+        Debug.Log("i static delay: " + iStaticDelay);
+        Debug.Log("i Mask Delay: " + iMaskDelay);
         startTimer = true;
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
             if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
             {   //each new mondrian will be found using a do while loop
+                Debug.Log("-------> " + iMaskDelay);
                 do
                 {
                     x = Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
@@ -423,16 +429,16 @@ public class ExperimentRunner : MonoBehaviour
             //once i reaches the flash delay it will begin fading in the image
             if (i >= iStaticDelay)
             {
-                Debug.Log(opacity);
+                Debug.Log("-------> " + opacity);
                 //opacity will increase with each iteration until it reaches the specified opacity
                 opacity += opacityIncrease;
                 changeImage.color = new Color(opacity, opacity, opacity, opacity);
             }
 
-            if (exit)
+            if (exit)           //if trial exited
                 yield break;
 
-            if (response && T.isResponse && T.responseStop)
+            if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
@@ -450,10 +456,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         ImgArr[x].enabled = false;      //then turn off the last mondrian 
         changeImage.enabled = false;    //turn off the main image
         trialHasRun = true;
@@ -472,7 +476,7 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = ((float)T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
@@ -487,7 +491,6 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("waiting Period: " + waitingPeriod);
         Debug.Log("iMask Delay: " + iMaskDelay);
         Debug.Log("num of Iterations: " + numOfIt);
-        Debug.Log("Static delay: " + iStaticDelay);
         if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
         {                                               //not increase throughout
             changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
@@ -519,10 +522,10 @@ public class ExperimentRunner : MonoBehaviour
                 changeImage.color = new Color(opacity, opacity, opacity, opacity);
             }
 
-            if (exit)
+            if (exit)           //if trial exited
                 yield break;
 
-            if (response && T.isResponse && T.responseStop)
+            if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
@@ -540,10 +543,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         ImgArr[x].enabled = false;      //then turn off the last mondrian 
         changeImage.enabled = false;    //turn off the main image
         trialHasRun = true;
@@ -563,7 +564,7 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
@@ -602,10 +603,10 @@ public class ExperimentRunner : MonoBehaviour
             }
 
 
-            if (exit)
+            if (exit)           //if trial exited
                 yield break;
 
-            if (response && T.isResponse && T.responseStop)
+            if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
@@ -623,10 +624,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         changeImage.enabled = false;    //turn off the main image
         oppositeChangeImage.enabled = false;
         trialHasRun = true;
@@ -647,7 +646,7 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float waitingPeriod = (float)T.flashDuration / 1000;        //the time between each waiting
@@ -685,10 +684,10 @@ public class ExperimentRunner : MonoBehaviour
                 changeImage2.color = new Color(opacity, opacity, opacity, opacity);
             }
 
-            if (exit)
+            if (exit)           //if trial exited
                 yield break;
 
-            if (response && T.isResponse && T.responseStop)
+            if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
@@ -706,10 +705,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         ImgArr[x].enabled = false;      //then turn off the last mondrian 
         changeImage1.enabled = false;    //turn off the main image
         changeImage2.enabled = false;
@@ -732,7 +729,7 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
@@ -776,10 +773,10 @@ public class ExperimentRunner : MonoBehaviour
                 changeImage2.color = new Color(opacity, opacity, opacity, opacity);
             }
 
-            if (exit)
+            if (exit)           //if trial exited
                 yield break;
 
-            if (response && T.isResponse && T.responseStop)
+            if (response && T.isResponse && T.responseStop)         //if the trial is a response
                 break;
 
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
@@ -797,10 +794,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         ImgArr[x].enabled = false;      //then turn off the last mondrian 
         changeImage1.enabled = false;    //turn off the main image
         changeImage2.enabled = false;
@@ -824,7 +819,7 @@ public class ExperimentRunner : MonoBehaviour
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = ((float)T.opacity / iStaticDelay) / 100;
+        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float opacity = new float();
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
@@ -870,8 +865,7 @@ public class ExperimentRunner : MonoBehaviour
                 changeImage2.enabled = true;
             }
 
-
-            if (exit)
+            if (exit)               //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)     //if the trial is a response 
@@ -892,10 +886,8 @@ public class ExperimentRunner : MonoBehaviour
                 T.response = System.String.Copy(responseHolder.Remove(0, 1));
                 T.responseTime = System.String.Copy(responseTiming.Remove(0, 1));
             }
-        upRes = downRes = leftRes = rightRes = "";
-        responseHolder = responseTiming = "";
-        response = false;
-        startTimer = false;
+        upRes = downRes = leftRes = rightRes = responseTiming = responseHolder = "";
+        response = startTimer = false;
         changeImage1.enabled = false;    //turn off the main image
         changeImage2.enabled = false;
         oppositeChangeImage.enabled = false;
@@ -907,192 +899,198 @@ public class ExperimentRunner : MonoBehaviour
 
     public void writeTrial(Item IT, int cond, bool condRand, int blk, bool blkRand, int trial, int counter)     //simple writer to an external csv named with the input ID
     {   //using the input path
-        string fileName = exp.path + ID + ".csv";
+        string fileName = "";
+        if (exp.outputPath != string.Empty)
+            fileName = exp.outputPath + "/" + ID + ".csv";
+        else
+            fileName = exp.directory + "/" + ID + ".csv";
         //System.IO.FileStream writer = new System.IO.FileStream(fileName, FileMode.Append);
-        StreamWriter writer = new StreamWriter(fileName, true);
-        if (!writerStart)
+        using (StreamWriter writer = File.AppendText(fileName))
         {
-            writer.Write("Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mondrian,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
-            writerStart = true;
-        }
-        if (IT is Instruction)
-        {
-            Instruction I = IT as Instruction;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            writer.Write("Instruction,");
-            writer.Write(++trial + ",");
-            writer.Write(I.random + ",");
-            writer.Write(I.image + ",");
-            writer.Write(I.duration + ",,,,,,");
-            writer.Write(I.responseTime + ",\n");
-        }
-        else if (IT is Response)
-        {
-            Response R = IT as Response;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            writer.Write("Response,");
-            writer.Write(++trial + ",");
-            writer.Write(R.random + ",");
-            writer.Write(R.image + ",,,,,,,");
-            writer.Write(R.responseTime + ",");
-            writer.Write(R.up + ",");
-            writer.Write(R.down + ",");
-            writer.Write(R.left + ",");
-            writer.Write(R.right + ",");
-            writer.Write(R.response + ",\n");
-        }
-        else if (IT is Break)
-        {
-            Break B = IT as Break;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            writer.Write("Break,");
-            writer.Write(++trial + ",");
-            writer.Write(B.random + ",");
-            writer.Write(B.image + ",");
-            writer.Write(B.duration + ",\n");
-        }
-        else if (IT is MondTrial)
-        {
-            MondTrial T = IT as MondTrial;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            if (T.hasMultipleStims)
+            if (!writerStart)
             {
-                writer.Write("MultiMondrianTrial,");
+                writer.Write("Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mondrian,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
+                writerStart = true;
+            }
+            if (IT is Instruction)
+            {
+                Instruction I = IT as Instruction;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                writer.Write("Instruction,");
                 writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + "_" + T.image2 + ",");
+                writer.Write(I.random + ",");
+                writer.Write(I.image + ",");
+                writer.Write(I.duration + ",,,,,,");
+                writer.Write(I.responseTime + ",\n");
             }
-            else
+            else if (IT is Response)
             {
-                writer.Write("MondrianTrial,");
+                Response R = IT as Response;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                writer.Write("Response,");
                 writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + ",");
+                writer.Write(R.random + ",");
+                writer.Write(R.image + ",,,,,,,");
+                writer.Write(R.responseTime + ",");
+                writer.Write(R.up + ",");
+                writer.Write(R.down + ",");
+                writer.Write(R.left + ",");
+                writer.Write(R.right + ",");
+                writer.Write(R.response + ",\n");
             }
-            writer.Write(T.duration + ",");
-            writer.Write(T.flashDuration + ",");
-            writer.Write(T.opacity + ",");
-            writer.Write(T.maskDelay + ",");
-            writer.Write(T.staticDelay + ",");
-            writer.Write(T.mond + ",");
-            if (T.isResponse)
+            else if (IT is Break)
             {
-                writer.Write(T.responseTime + ",");
-                writer.Write(T.up + ",");
-                writer.Write(T.down + ",");
-                writer.Write(T.left + ",");
-                writer.Write(T.right + ",");
-                writer.Write(T.response + ",,");
-                writer.Write((!T.responseStop) + ",");
-                responseHolder = "";
-                responseTiming = "";
+                Break B = IT as Break;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                writer.Write("Break,");
+                writer.Write(++trial + ",");
+                writer.Write(B.random + ",");
+                writer.Write(B.image + ",");
+                writer.Write(B.duration + ",\n");
             }
-            writer.Write("\n");
+            else if (IT is MondTrial)
+            {
+                MondTrial T = IT as MondTrial;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                if (T.hasMultipleStims)
+                {
+                    writer.Write("MultiMondrianTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + "_" + T.image2 + ",");
+                }
+                else
+                {
+                    writer.Write("MondrianTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + ",");
+                }
+                writer.Write(T.duration + ",");
+                writer.Write(T.flashDuration + ",");
+                writer.Write(T.opacity + ",");
+                writer.Write(T.maskDelay + ",");
+                writer.Write(T.staticDelay + ",");
+                writer.Write(T.mond + ",");
+                if (T.isResponse)
+                {
+                    writer.Write(T.responseTime + ",");
+                    writer.Write(T.up + ",");
+                    writer.Write(T.down + ",");
+                    writer.Write(T.left + ",");
+                    writer.Write(T.right + ",");
+                    writer.Write(T.response + ",,");
+                    writer.Write((!T.responseStop) + ",");
+                    responseHolder = "";
+                    responseTiming = "";
+                }
+                writer.Write("\n");
+            }
+            else if (IT is FlashMondTrial)
+            {
+                FlashMondTrial T = IT as FlashMondTrial;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                if (T.hasMultipleStims)
+                {
+                    writer.Write("MultiMondrianTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + "_" + T.image2 + ",");
+                }
+                else
+                {
+                    writer.Write("MondrianTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + ",");
+                }
+                writer.Write(T.duration + ",");
+                writer.Write(T.flashDuration + ",");
+                writer.Write(T.opacity + ",");
+                writer.Write(T.maskDelay + ",");
+                writer.Write(T.staticDelay + ",");
+                writer.Write(T.mond + ",");
+                if (T.isResponse)
+                {
+                    writer.Write(T.responseTime + ",");
+                    writer.Write(T.up + ",");
+                    writer.Write(T.down + ",");
+                    writer.Write(T.left + ",");
+                    writer.Write(T.right + ",");
+                    writer.Write(T.response + ",");
+                    responseHolder = "";
+                    responseTiming = "";
+                }
+                else
+                    writer.Write(",,,,,,");
+                writer.Write(T.flashPeriod + ",");
+                writer.Write((!T.responseStop) + "\n");
+            }
+            else if (IT is MaskTrial)
+            {
+                MaskTrial T = IT as MaskTrial;
+                writer.Write(++counter + ",");
+                writer.Write(++cond + ",");
+                writer.Write(condRand + ",");
+                writer.Write(++blk + ",");
+                writer.Write(blkRand + ",");
+                if (T.hasMultipleStims)
+                {
+                    writer.Write("MultiMaskTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + "&" + T.image2 + ",");
+                }
+                else
+                {
+                    writer.Write("MaskTrial,");
+                    writer.Write(++trial + ",");
+                    writer.Write(T.random + ",");
+                    writer.Write(T.image + ",");
+                }
+                writer.Write(T.duration + ",");
+                writer.Write(T.flashDuration + ",");
+                writer.Write(T.opacity + ",");
+                writer.Write(T.maskDelay + ",");
+                writer.Write(T.staticDelay + ",");
+                writer.Write(T.mask + ",");
+                if (T.isResponse)
+                {
+                    writer.Write(T.responseTime + ",");
+                    writer.Write(T.up + ",");
+                    writer.Write(T.down + ",");
+                    writer.Write(T.left + ",");
+                    writer.Write(T.right + ",");
+                    writer.Write(T.response + ",");
+                    responseHolder = "";
+                    responseTiming = "";
+                }
+                else
+                    writer.Write(",,,,,,");
+                writer.Write(T.flashPeriod + ",");
+                writer.Write((!T.responseStop) + "\n");
+            }
+            writer.Close();
         }
-        else if (IT is FlashMondTrial)
-        {
-            FlashMondTrial T = IT as FlashMondTrial;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            if (T.hasMultipleStims)
-            {
-                writer.Write("MultiMondrianTrial,");
-                writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + "_" + T.image2 + ",");
-            }
-            else
-            {
-                writer.Write("MondrianTrial,");
-                writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + ",");
-            }
-            writer.Write(T.duration + ",");
-            writer.Write(T.flashDuration + ",");
-            writer.Write(T.opacity + ",");
-            writer.Write(T.maskDelay + ",");
-            writer.Write(T.staticDelay + ",");
-            writer.Write(T.mond + ",");
-            if (T.isResponse)
-            {
-                writer.Write(T.responseTime + ",");
-                writer.Write(T.up + ",");
-                writer.Write(T.down + ",");
-                writer.Write(T.left + ",");
-                writer.Write(T.right + ",");
-                writer.Write(T.response + ",");
-                responseHolder = "";
-                responseTiming = "";
-            }
-            else
-                writer.Write(",,,,,,");
-            writer.Write(T.flashPeriod + ",");
-            writer.Write((!T.responseStop) + "\n");
-        }
-        else if (IT is MaskTrial)
-        {
-            MaskTrial T = IT as MaskTrial;
-            writer.Write(++counter + ",");
-            writer.Write(++cond + ",");
-            writer.Write(condRand + ",");
-            writer.Write(++blk + ",");
-            writer.Write(blkRand + ",");
-            if (T.hasMultipleStims)
-            {
-                writer.Write("MultiMaskTrial,");
-                writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + "&" + T.image2 + ",");
-            }
-            else
-            {
-                writer.Write("MaskTrial,");
-                writer.Write(++trial + ",");
-                writer.Write(T.random + ",");
-                writer.Write(T.image + ",");
-            }
-            writer.Write(T.duration + ",");
-            writer.Write(T.flashDuration + ",");
-            writer.Write(T.opacity + ",");
-            writer.Write(T.maskDelay + ",");
-            writer.Write(T.staticDelay + ",");
-            writer.Write(T.mask + ",");
-            if (T.isResponse)
-            {
-                writer.Write(T.responseTime + ",");
-                writer.Write(T.up + ",");
-                writer.Write(T.down + ",");
-                writer.Write(T.left + ",");
-                writer.Write(T.right + ",");
-                writer.Write(T.response + ",");
-                responseHolder = "";
-                responseTiming = "";
-            }
-            else
-                writer.Write(",,,,,,");
-            writer.Write(T.flashPeriod + ",");
-            writer.Write((!T.responseStop) + "\n");
-        }
-        writer.Close();
     }
 }
