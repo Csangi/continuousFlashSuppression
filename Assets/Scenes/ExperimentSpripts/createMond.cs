@@ -20,7 +20,7 @@ public class createMond : MonoBehaviour
     //this is the mod vaule
     private float period;
     public int palette;
-    List<List<Color>> colors = new List<List<Color>>();
+    Dictionary<string, List<Color>> colors = new Dictionary<string, List<Color>>();
 
     //used for loading screen
     public static int numOfMonds = 1;
@@ -33,44 +33,52 @@ public class createMond : MonoBehaviour
     {
         colors.Clear();
         setColorValues();
-        int whichmond = 0,
-            i = 0,
+        List<string> mondKeys = new List<string>();
+        int i = 0,
+            j = 0,
             numOfMondsUsed = 0, // this refers to the total number of mondrians used in this experiment
             counter = 0;        //this counts the mondrians as they are being written. 
-        bool endOfMonds = false;
+        string whichmond = "";
+        foreach (KeyValuePair<string,Mondrian> item in exp.Mondrians)
+        {
+            mondKeys.Add(item.Key);
+        }
+
         for (int k = 0; k < exp.Mondrians.Count(); ++k)
         {   //here we count how many mondrians are used in the mondrian array 
-            if (exp.Mondrians[k].isUsed)
+            if (exp.Mondrians[mondKeys[k]].isUsed)
                 ++numOfMondsUsed;
         }
         numOfMonds = numOfMondsUsed * 20;
         makeImagesBlank(rightImgArr, leftImgArr);       //here we blank out all 100 mondrian images to make sure we dont draw over another mondrian
         //here we loop through all 100 mondrian images and find the mondrians which are actually used and drawn them
         //We also log there minimum range and Maximum range in the mondrian array
-        while (i < rightImgArr.Length && !endOfMonds && counter != numOfMondsUsed)
+        while (i < rightImgArr.Length && j < mondKeys.Count() && counter != numOfMondsUsed)
         {
-            while (!exp.Mondrians[whichmond].isUsed)
-                ++whichmond;
+            while (!exp.Mondrians[mondKeys[j]].isUsed)
+            {
+                ++j;
+            }
 
             //this is logging the minimum range which this particular mondrian will be in
-            exp.Mondrians[whichmond].minRange = i;
+            exp.Mondrians[mondKeys[j]].minRange = i;
 
-            for (int j = 0; j < 20; ++j, ++i)
+            for (int k = 0; k < 20; ++k, ++i)
             {
-                mondTask(whichmond, rightImgArr[i], leftImgArr[i]);
+                mondTask(mondKeys[j], rightImgArr[i], leftImgArr[i]);
             }
-            exp.Mondrians[whichmond].maxRange = i - 1;
+            exp.Mondrians[mondKeys[j]].maxRange = i - 1;
             //this is the maximum range which the mondrian will be in
             //we do this so that the experiment runner actually knows where each mondrians textures are while running. 
 
-            ++whichmond;
+            ++j;
             ++counter;
         }
         exp.mondsHaveBeenDrawn = true;
         exp.printMondrians();
     }
 
-    public void mondTask(int whichmond, RawImage rightImg, RawImage leftImg)
+    public void mondTask(string whichmond, RawImage rightImg, RawImage leftImg)
     {
         if (exp.Mondrians[whichmond].shape == Shape.ellipse)
         {
@@ -114,11 +122,20 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, width, height;
+        int x, y, width, height, colorNumber = 0;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            c = color[Random.Range(0, color.Count)];
+            if (color.Count > 1)
+            {
+                colorNumber++;
+                if (!(colorNumber < color.Count))
+                    colorNumber = 0;
+
+                c = color[colorNumber];
+            }
+            else
+                c = color.First();
             x = Random.Range(0, 225);
             width = Random.Range(mond.minWidth, mond.maxWidth);
             y = Random.Range(0, 225);
@@ -135,12 +152,21 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, radius;
+        int x, y, radius, colorNumber = 0;
         float rSquared;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            c = color[Random.Range(0, color.Count)];
+            if (color.Count > 1)
+            {
+                colorNumber++;
+                if (!(colorNumber < color.Count))
+                    colorNumber = 0;
+
+                c = color[colorNumber];
+            }
+            else
+                c = color.First();
             x = Random.Range(0, 225);
             radius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2);
             y = Random.Range(0, 225);
@@ -159,11 +185,20 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, size;
+        int x, y, size, colorNumber = 0;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            c = color[Random.Range(0, color.Count)];
+            if (color.Count > 1)
+            {
+                colorNumber++;
+                if (!(colorNumber < color.Count))
+                    colorNumber = 0;
+
+                c = color[colorNumber];
+            }
+            else
+                c = color.First();
             x = Random.Range(0, 225);
             size = Random.Range(mond.minWidth, mond.maxWidth);
             y = Random.Range(0, 225);
@@ -179,11 +214,20 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, tbase, height;
+        int x, y, tbase, height, colorNumber = 0;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            c = color[Random.Range(0, color.Count)];
+            if (color.Count > 1)
+            {
+                colorNumber++;
+                if (!(colorNumber < color.Count))
+                    colorNumber = 0;
+
+                c = color[colorNumber];
+            }
+            else
+                c = color.First();
             x = Random.Range(0, 225);
             tbase = Random.Range(mond.minWidth, mond.maxWidth);
             y = Random.Range(0, 225);
@@ -201,11 +245,20 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, xradius, yradius;
+        int x, y, xradius, yradius, colorNumber = 0;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            c = color[Random.Range(0, color.Count)];
+            if (color.Count > 1)
+            {
+                colorNumber++;
+                if (!(colorNumber < color.Count))
+                    colorNumber = 0;
+
+                c = color[colorNumber];
+            }
+            else
+                c = color.First();
             x = Random.Range(0, 225);
             xradius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2);
             y = Random.Range(0, 225);
@@ -222,10 +275,20 @@ public class createMond : MonoBehaviour
     public static Texture2D DrawPixelated(Texture2D tex, List<Color> color, Mondrian mond)
     {
         Color c;
+        int colorNumber = 0;
         for (int i = 0; i <= 225; ++i)
             for (int j = 0; j <= 255; ++j)
             {
-                c = color[Random.Range(0, color.Count)];
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
                 tex.SetPixel(i, j, c);
             }
         tex.Apply();
@@ -236,13 +299,22 @@ public class createMond : MonoBehaviour
     {
         if (mond.addPixelated)
             DrawPixelated(tex, color, mond);
-        int x, y, xradius, yradius, width, height, size;
+        int x, y, xradius, yradius, width, height, size, colorNumber = 0;
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
             if (i % 4 == 0) //ellipse
             {
-                c = color[Random.Range(0, color.Count)];
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
                 x = Random.Range(0, 225);
                 xradius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2);
                 y = Random.Range(0, 225);
@@ -255,7 +327,16 @@ public class createMond : MonoBehaviour
             }
             else if (i % 4 == 1)   //rectangle
             {
-                c = color[Random.Range(0, color.Count)];
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
                 x = Random.Range(0, 225);
                 width = Random.Range(mond.minWidth, mond.maxWidth);
                 y = Random.Range(0, 225);
@@ -267,7 +348,16 @@ public class createMond : MonoBehaviour
             }
             else if (i % 4 == 2)     //circle
             {
-                c = color[Random.Range(0, color.Count)];
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
                 x = Random.Range(0, 225);
                 xradius = Random.Range(mond.minWidth / 2, mond.maxWidth / 2) + 10;
                 y = Random.Range(0, 225);
@@ -280,7 +370,16 @@ public class createMond : MonoBehaviour
             }
             else if (i % 4 == 3)     //square
             {
-                c = color[Random.Range(0, color.Count)];
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
                 x = Random.Range(0, 225);
                 size = Random.Range(mond.minWidth, mond.maxWidth);
                 y = Random.Range(0, 225);
@@ -316,80 +415,86 @@ public class createMond : MonoBehaviour
     {
         int counter = 0, red = -1, green = -1, blue = -1;
         List<Color> row = new List<Color>();
-        row.Add(new Color(255, 0, 0));      //red
-        row.Add(new Color(0, 255, 0));      //green
-        row.Add(new Color(0, 0, 255));      //blue
-        row.Add(new Color(255, 0, 255));    //magenta
-        row.Add(new Color(255, 255, 0));    //yellow
-        row.Add(new Color(0, 255, 255));    //cyan
-        colors.Add(row);
+        row.Add(new Color((float)255/255, 0, 0));      //red
+        row.Add(new Color(0, (float)255 / 255, 0));      //green
+        row.Add(new Color(0, 0, (float)255 / 255));      //blue
+        row.Add(new Color((float)255 / 255, 0, (float)255 / 255));    //magenta
+        row.Add(new Color((float)255 / 255, (float)255 / 255, 0));    //yellow
+        row.Add(new Color(0, (float)255 / 255, (float)255 / 255));    //cyan
+        colors.Add("0", row);
         row = new List<Color>();
-        string palettePath = Experiment.current.inputPath;                                                //its called image path because I copied my code from the image uploader
-        Debug.Log(palettePath);
-        while (!palettePath[palettePath.Length - 1].Equals('\\'))                   //we want to remove the original file name so that we can find the directory and navigate to the correct location
+        if (Experiment.current.paletteUploadNeeded)
         {
-            palettePath = palettePath.Remove(palettePath.Length - 1, 1);
-        }
-        palettePath += "colorPalette.csv";
-        Debug.Log(palettePath);
-
-        if (palettePath.Length != 0 && File.Exists(palettePath))
-        {
-            using (var sr = new StreamReader(palettePath))          //open up a stream reader on the path
+            string palettePath = Experiment.current.inputPath, key = "";                //its called image path because I copied my code from the image uploader
+            Debug.Log(palettePath);
+            while (!palettePath[palettePath.Length - 1].Equals('\\'))                   //we want to remove the original file name so that we can find the directory and navigate to the correct location
             {
-                bool EOF = false;
-                while (!EOF)
+                palettePath = palettePath.Remove(palettePath.Length - 1, 1);
+            }
+            palettePath += "colorPalette.csv";
+            Debug.Log(palettePath);
+
+            if (palettePath.Length != 0 && File.Exists(palettePath))
+            {
+                using (var sr = new StreamReader(palettePath))      //open up a stream reader on the path
                 {
-                    string data = sr.ReadLine();                //read in line by line
-                    if (data == null)
+                    bool EOF = false;
+                    while (!EOF)
                     {
-                        EOF = true;
-                        break;
-                    }
-                    var values = data.Split(',');               //input into an array
-                    for (int i = 0; i < values.Length; i++)     //loop through each line with a line being its own palette
-                    {
-                        Debug.Log(values.Length);
-                        Debug.Log(values[i]);
-                        if (counter > 0)
+                        string data = sr.ReadLine();                //read in line by line
+                        if (data == null)
                         {
-                            int result = 0;
-                            result = System.Int32.Parse(values[i]);
-                            Debug.Log(result);
-                            if (i == 0)                         //ignore first column
+                            EOF = true;
+                            break;
+                        }
+                        var values = data.Split(',');               //input into an array
+                        red = green = blue = -1;
+                        for (int i = 0; i < values.Length; i++)     //loop through each line with a line being its own palette
+                        {
+                            //Debug.Log(values.Length);
+                            Debug.Log(values[i]);
+                            if (counter > 1)
                             {
-                                Debug.Log("do nothing");
-                            }
-                            else if (red == -1)                 //the order goes r g b so everytime we loop through a line we will populate accordingly
-                            {
-                                red = result;
-                            }
-                            else if (green == -1)
-                            {
-                                green = result;
-                            }
-                            else if (blue == -1)
-                            {
-                                blue = result;
-                            }
-                            else
-                            {                                   //once these are all filled add teh color and start again
-                                row.Add(new Color(red, green, blue));
-                                red = green = blue = -1;
-                                red = result;
+                                if (i == 0)                                 //ignore first column
+                                {
+                                    key = values[i].ToString();
+                                }
+                                else if (red == -1)                         //the order goes r g b so everytime we loop through a line we will populate accordingly
+                                {
+                                    if (values[i] != System.String.Empty)
+                                        red = System.Int32.Parse(values[i]);
+                                }
+                                else if (green == -1)
+                                {
+                                    if (values[i] != System.String.Empty)
+                                        green = System.Int32.Parse(values[i]);
+                                }
+                                else if (blue == -1)
+                                {
+                                    if (values[i] != System.String.Empty)
+                                        blue = System.Int32.Parse(values[i]);
+                                }
+                                else
+                                {                                           //once these are all filled add teh color and start again
+                                    row.Add(new Color((float)red / 255, (float)green / 255, (float)blue / 255));
+                                    red = green = blue = -1;
+                                    if (values[i] != System.String.Empty)
+                                        red = System.Int32.Parse(values[i]);
+                                }
                             }
                         }
+                        if (counter > 1)                //ignore first row
+                        {
+                            if (!(red == blue && blue == green && green == -1))
+                                row.Add(new Color((float)red / 255, (float)green / 255, (float)blue / 255));
+                            colors.Add(key, row);
+                            row = new List<Color>();
+                        }
+                        counter++;
                     }
-                    if (counter > 0)                //ignore first row
-                    {
-                        colors.Add(row);
-                        row = new List<Color>();
-                    }
-                    counter++;
+                    sr.Close();
                 }
-                sr.Close();
             }
-
         }
     }
 }

@@ -27,15 +27,19 @@ public class Block
     public void randomizeTrials()                                 //function to randomize trials given whether they were supposed to be randomized                          
     {
         int x, holder;
+        Debug.Log("We in this bitch 1");
         if (numberOfTrials > 1)
             for (int i = 0; i < numberOfTrials; i++)                      //loop through the array of trials                                                                        
-            {//Make a random variable x that has a range between 0 and number of trials -1 (-1 because index starts at 0) and makes a new random number every loop              
-                if (this.trials[i].random)//if the trial was set to be randomized and is a version trial                                            
+            {//Make a random variable x that has a range between 0 and number of trials -1 (-1 because index starts at 0) and makes a new random number every loop
+                Debug.Log("We in this bitch 2");
+                if (this.trials[i].random != 0)//if the trial was set to be randomized and is a version trial                                            
                 {
                     do
                     {//Make a random variable x that has a range between 0 and number of trials -1 (-1 because index starts at 0) and makes a new random number every loop      
-                        x = Random.Range(0, numberOfTrials - 1);
-                    } while (!this.trials[x].random);//while the random trial is also a trial that can be randomized                                
+                        x = Random.Range(0, numberOfTrials);
+                    } while (this.trials[x].random != this.trials[i].random);//while the random trial is also a trial that can be randomized
+                    Debug.Log(i + "is switching with " + x);
+                    Debug.Log(this.trials[i].random + "<-Their random numbers->" + this.trials[x].random);
                     holder = this.index[i];
                     this.index[i] = this.index[x];
                     this.index[x] = holder;

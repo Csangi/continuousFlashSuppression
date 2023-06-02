@@ -53,5 +53,7 @@ public class Condition
                     index[x] = holder;                             //swap x and i                                                   
                 }
             }
+        else
+            blocks[0].randomizeTrials();
     }
 }

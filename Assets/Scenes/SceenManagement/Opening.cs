@@ -68,7 +68,7 @@ public class Opening : MonoBehaviour
             {
                 experiment.addCondition(new Condition(true));                       //no matter what we will still need to add the first condition and block
                 experiment.conditions[numberCondition].addBlocks(new Block(false));
-                experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
+                experiment.Mondrians.Add("0", new Mondrian("0", 1, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
                 experiment.mondsHaveBeenDrawn = false;
                 //uiManager.uploadExperiment(args[1], numberCondition, numberBlock);
             }

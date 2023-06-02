@@ -10,15 +10,15 @@ using UnityEngine.UI;
 public class MondrianBuilder : MonoBehaviour
 {
     //public Mondrian(int palette, int sh, bool pix, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
-    public bool pix;
-    public string mond = "";
-    public int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum;
+    private bool pix;
+    private string mond = "";
+    private int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum;
     public RawImage rawImage;
     public GameObject errorText;
     List<List<Color>> colors = new List<List<Color>>();
-    public bool savingMond, mondDrawn;
-    public string outputPath = "";
-    public string folderName = "";
+    private bool savingMond, mondDrawn;
+    private string outputPath = "";
+    private string folderName = "";
     public Dropdown paletteDropdown;
 
     void Start()
@@ -115,6 +115,11 @@ public class MondrianBuilder : MonoBehaviour
         }
     }
 
+    public void clearMondrian()
+    {
+        createMond.makeBlank(rawImage.texture as Texture2D);
+    }
+
     public void backToOpening()
     {
         createMond.makeBlank(rawImage.texture as Texture2D);
@@ -127,47 +132,47 @@ public class MondrianBuilder : MonoBehaviour
     public void runMondrianCreator()        //this simplily creates the mondrian and makes it depending on the shape
     {
         Debug.Log("increator");
-        Mondrian m = new Mondrian(palette, sh, pix, minWidth, maxWidth, minHeight, maxHeight, density);
+        Mondrian m = new Mondrian("0", sh + 1, pix, minWidth, maxWidth, minHeight, maxHeight, density);
         mondDrawn = false;
         m.printMond();
 
         createMond.makeBlank(rawImage.texture as Texture2D);
 
-        Debug.Log(colors[m.palette].Count());
+        Debug.Log(colors[palette].Count());
 
         if (m.shape == Shape.ellipse)
         {
-            rawImage.texture = createMond.DrawEllipse(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawEllipse(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("ellipse");
         }
         else if (m.shape == Shape.rectangle)
         {
-            rawImage.texture = createMond.DrawRectangle(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawRectangle(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("rectangle");
         }
         else if (m.shape == Shape.triangle)
         {
-            rawImage.texture = createMond.DrawTriangle(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawTriangle(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("triangle");
         }
         else if (m.shape == Shape.pixelated)
         {
-            rawImage.texture = createMond.DrawPixelated(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawPixelated(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("Pixelated");
         }
         else if (m.shape == Shape.circle)
         {
-            rawImage.texture = createMond.DrawCircle(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawCircle(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("Circle");
         }
         else if (m.shape == Shape.square)
         {
-            rawImage.texture = createMond.DrawSquare(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawSquare(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("Square");
         }
         else if (m.shape == Shape.mixed)
         {
-            rawImage.texture = createMond.DrawMixed(rawImage.texture as Texture2D, colors[m.palette], m);
+            rawImage.texture = createMond.DrawMixed(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("Mixed");
         }
         mondDrawn = true;
@@ -204,7 +209,7 @@ public class MondrianBuilder : MonoBehaviour
 
     public void saveMond()
     {
-        if (!savingMond && mondDrawn)
+        if (!savingMond && mondDrawn && Directory.Exists(outputPath))
         {
             savingMond = true;
             StartCoroutine(saveMondrian());     //send to the mondrian saver
@@ -213,22 +218,23 @@ public class MondrianBuilder : MonoBehaviour
         else
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "No Mondrian was drawn.";
+            errorText.GetComponent<Text>().text = "No Mondrian was drawn. (Make sure to upload a folder)";
         }
     }
 
     public IEnumerator saveMondrian()       // this function will find the output path and draw the specified number of mondrians and save them
     {
-        outputPath += "\\" + folderName;
-        if (!Directory.Exists(outputPath))                  //if the directory DNE then create it
-            Directory.CreateDirectory(outputPath);
+        string path = outputPath + "\\" + folderName;
+        if (!Directory.Exists(path))                  //if the directory DNE then create it
+            Directory.CreateDirectory(path);
 
+        runMondrianCreator();
         for (int i = 0; i < mondNum; ++i)                                           //loop waiting for the mond to be drawn. 
         {
             yield return new WaitForEndOfFrame();                                   //wait until it is drawn
             byte[] byteArr = (rawImage.texture as Texture2D).EncodeToPNG();         //change the texture 2D to a byte Arr
-            System.IO.File.WriteAllBytes(outputPath + "\\" + mond + num + ".png", byteArr);     //and save that byte Arr to png in the specified directory
-            Debug.Log(outputPath + "\\" + mond + num + ".png");
+            System.IO.File.WriteAllBytes(path + "\\" + mond + num + ".png", byteArr);     //and save that byte Arr to png in the specified directory
+            Debug.Log(path + "\\" + mond + num + ".png");
             ++num;
             runMondrianCreator();                           //draw new mondrians
             yield return new WaitUntil(() => mondDrawn);    //wait until they are done. 
@@ -240,18 +246,18 @@ public class MondrianBuilder : MonoBehaviour
     void setColorValues()
     {
         List<Color> row = new List<Color>();
-        row.Add(new Color(255, 0, 0));      //red
-        row.Add(new Color(0, 255, 0));      //green
-        row.Add(new Color(0, 0, 255));      //blue
-        row.Add(new Color(255, 0, 255));    //magenta
-        row.Add(new Color(255, 255, 0));    //yellow
-        row.Add(new Color(0, 255, 255));    //cyan
+        row.Add(new Color((float)255 / 255, 0, 0));      //red
+        row.Add(new Color(0, (float)255 / 255, 0));      //green
+        row.Add(new Color(0, 0, (float)255 / 255));      //blue
+        row.Add(new Color((float)255 / 255, 0, (float)255 / 255));    //magenta
+        row.Add(new Color((float)255 / 255, (float)255 / 255, 0));    //yellow
+        row.Add(new Color(0, (float)255 / 255, (float)255 / 255));    //cyan
         colors.Add(row);
         row = new List<Color>();
         row.Add(new Color(0, 0, 0));            //black
-        row.Add(new Color(255, 255, 255));      //white
-        row.Add(new Color(192, 192, 192));      //light gray
-        row.Add(new Color(128, 128, 128));      //grey
+        row.Add(new Color((float)255 / 255, (float)255 / 255, (float)255 / 255));      //white
+        row.Add(new Color((float)192/255, (float)192 / 255, (float)192 / 255));      //light gray
+        row.Add(new Color((float)128 / 255, (float)128 / 255, (float)128 / 255));      //grey
         colors.Add(row);
     }
 
@@ -274,21 +280,54 @@ public class MondrianBuilder : MonoBehaviour
         catch (IndexOutOfRangeException)
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (IOOR)";
         }
         catch (NullReferenceException)
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (NRE)";
         }
     }
 
 
-
-
-    public void uploadPalette(string palettePath)
+    public void uploadFolderButton()
     {
+        string[] holderPath;
+        string path = "";
+        try
+        {
+            holderPath = SFB.StandaloneFileBrowser.OpenFolderPanel("Open File", "", false);
+            foreach (var i in holderPath)
+                path += i;
+            Debug.Log(path);
+            changePath(path);
+        }
+        catch (IOException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+        }
+        catch (IndexOutOfRangeException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (IOOR)";
+        }
+        catch (NullReferenceException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (NRE)";
+        }
+    }
+
+    private void uploadPalette(string palettePath)
+    {
+        colors.Clear();
+        setColorValues();
+        paletteDropdown.options.Clear();
+        paletteDropdown.options.Add(new Dropdown.OptionData("Neon"));
+        paletteDropdown.options.Add(new Dropdown.OptionData("Black & White"));
         int counter = 0, red = -1, green = -1, blue = -1;
+        string name = "";
         List<Color> row = new List<Color>();
         Debug.Log(palettePath);
 
@@ -306,48 +345,62 @@ public class MondrianBuilder : MonoBehaviour
                         break;
                     }
                     var values = data.Split(',');                       //input into an array
+                    red = green = blue = -1;
                     for (int i = 0; i < values.Length; i++)             //loop through each line with a line being its own palette
                     {
-                        Debug.Log(values.Length);
-                        Debug.Log(values[i]);
-                        if (counter > 0)
+                        if (counter > 1)
                         {
-                            int result = 0;
-                            result = System.Int32.Parse(values[i]);
-                            Debug.Log(result);
+                            Debug.Log(values[i]);
                             if (i == 0)                                 //ignore first column
                             {
-                                Debug.Log("do nothing");
+                                name = values[i].ToString();
                             }
                             else if (red == -1)                         //the order goes r g b so everytime we loop through a line we will populate accordingly
                             {
-                                red = result;
+                                if(values[i] != String.Empty)
+                                    red = System.Int32.Parse(values[i]);
                             }
                             else if (green == -1)
                             {
-                                green = result;
+                                if (values[i] != String.Empty)
+                                    green = System.Int32.Parse(values[i]);
                             }
                             else if (blue == -1)
                             {
-                                blue = result;
+                                if (values[i] != String.Empty)
+                                    blue = System.Int32.Parse(values[i]);
                             }
                             else
                             {                                           //once these are all filled add teh color and start again
-                                row.Add(new Color(red, green, blue));
+                                row.Add(new Color((float)red/255, (float)green/255, (float)blue/255));
                                 red = green = blue = -1;
-                                red = result;
+                                if (values[i] != String.Empty)
+                                    red = System.Int32.Parse(values[i]);
                             }
                         }
                     }
-                    if (counter > 0)            //ignore first row
+                    if (counter > 1)            //ignore first row
                     {
+                        if(!( red == blue && blue == green && green == -1))
+                            row.Add(new Color((float)red / 255, (float)green / 255, (float)blue / 255));
                         colors.Add(row);
                         row = new List<Color>();
-                        paletteDropdown.options.Add(new Dropdown.OptionData("input palette #" + counter));
+                        paletteDropdown.options.Add(new Dropdown.OptionData(name));
                     }               //add the drop down option
                     counter++;
+                    Debug.Log("counter = " + counter);
                 }
                 sr.Close();
+            }
+            int p = 0;
+            foreach(List<Color> c in colors)
+            {
+                p++;
+                Debug.Log(p);
+                foreach(Color C in c)
+                {
+                    Debug.Log("Color: " + C);
+                }
             }
             errorText.GetComponent<Text>().color = Color.white;
             errorText.GetComponent<Text>().text = "";

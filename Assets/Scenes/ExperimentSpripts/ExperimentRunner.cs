@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -142,38 +145,44 @@ public class ExperimentRunner : MonoBehaviour
             responseTiming += "_" + responseTimer.ToString();
             response = true;
         }
-        /*
-        if (Gamepad.current[GamepadButton.RightTrigger].isPressed)
-            introResponse = true;
 
-        if (Gamepad.current[GamepadButton.DpadDown].isPressed && !response)
+        try
         {
-            responseHolder += "_" + downRes;
-            responseTiming += "_" + responseTimer.ToString();
-            response = true;
-        }
+            if (Gamepad.current[GamepadButton.RightTrigger].isPressed)
+                introResponse = true;
 
-        if (Gamepad.current[GamepadButton.DpadUp].isPressed && !response)
-        {
-            responseHolder += "_" + upRes;
-            responseTiming += "_" + responseTimer.ToString();
-            response = true;
-        }
+            if (Gamepad.current[GamepadButton.DpadDown].isPressed && !response)
+            {
+                responseHolder += "_" + downRes;
+                responseTiming += "_" + responseTimer.ToString();
+                response = true;
+            }
 
-        if (Gamepad.current[GamepadButton.DpadRight].isPressed && !response)
-        {
-            responseHolder += "_" + rightRes;
-            responseTiming += "_" + responseTimer.ToString();
-            response = true;
-        }
+            if (Gamepad.current[GamepadButton.DpadUp].isPressed && !response)
+            {
+                responseHolder += "_" + upRes;
+                responseTiming += "_" + responseTimer.ToString();
+                response = true;
+            }
 
-        if (Gamepad.current[GamepadButton.DpadLeft].isPressed && !response)
-        {
-            responseHolder += "_" + leftRes;
-            responseTiming += "_" + responseTimer.ToString();
-            response = true;
+            if (Gamepad.current[GamepadButton.DpadRight].isPressed && !response)
+            {
+                responseHolder += "_" + rightRes;
+                responseTiming += "_" + responseTimer.ToString();
+                response = true;
+            }
+
+            if (Gamepad.current[GamepadButton.DpadLeft].isPressed && !response)
+            {
+                responseHolder += "_" + leftRes;
+                responseTiming += "_" + responseTimer.ToString();
+                response = true;
+            }
         }
-        */
+        catch (NullReferenceException)
+        {
+
+        }
     }
     IEnumerator runExperiment(RawImage changeImage, RawImage[] ImgArr)
     {
@@ -420,7 +429,7 @@ public class ExperimentRunner : MonoBehaviour
                 Debug.Log("-------> " + iMaskDelay);
                 do
                 {
-                    x = Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
                 } while (x == holder);
                 ImgArr[x].enabled = true;
                 ImgArr[holder].enabled = false;
@@ -504,7 +513,7 @@ public class ExperimentRunner : MonoBehaviour
             {   //each new mondrian will be found using a do while loop
                 do
                 {
-                    x = Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
                 } while (x == holder);
                 ImgArr[holder].enabled = false;
                 changeImage.enabled = false;
@@ -668,7 +677,7 @@ public class ExperimentRunner : MonoBehaviour
             {   //each new mondrian will be found using a do while loop
                 do
                 {
-                    x = Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
                 } while (x == holder);
                 ImgArr[x].enabled = true;
                 ImgArr[holder].enabled = false;
@@ -752,7 +761,7 @@ public class ExperimentRunner : MonoBehaviour
             {   //each new mondrian will be found using a do while loop
                 do
                 {
-                    x = Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
                 } while (x == holder);
                 ImgArr[holder].enabled = false;
                 changeImage1.enabled = false;
@@ -903,13 +912,13 @@ public class ExperimentRunner : MonoBehaviour
         if (exp.outputPath != string.Empty)
             fileName = exp.outputPath + "/" + ID + ".csv";
         else
-            fileName = exp.directory + "/" + ID + ".csv";
+            fileName = exp.csvOriginDirectory + "/" + ID + ".csv";
         //System.IO.FileStream writer = new System.IO.FileStream(fileName, FileMode.Append);
         using (StreamWriter writer = File.AppendText(fileName))
         {
             if (!writerStart)
             {
-                writer.Write("Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mondrian,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
+                writer.Write("Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mask,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
                 writerStart = true;
             }
             if (IT is Instruction)

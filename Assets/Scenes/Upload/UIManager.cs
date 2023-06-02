@@ -93,7 +93,7 @@ public class UIManager : MonoBehaviour
                 experiment.addCondition(new Condition(true));                       //no matter what we will still need to add the first condition and block
                 experiment.conditions[numberCondition].addBlocks(new Block(false));
                 if (experiment.Mondrians.Count() == 0)
-                    experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
+                    experiment.Mondrians.Add("0", new Mondrian("0", 1, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
                 experiment.mondsHaveBeenDrawn = false;
                 //convert string[] into normal string
                 uploadExperiment(experiment.args[1], numberCondition, numberBlock);
@@ -139,7 +139,13 @@ public class UIManager : MonoBehaviour
         starting();
     }
 
-    private void returnedFromExp()
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            StartGame();
+    }
+
+            private void returnedFromExp()
     {
         if (experiment.successfulUpload)
         {
@@ -202,31 +208,37 @@ public class UIManager : MonoBehaviour
             experiment.addCondition(new Condition(true));                       //no matter what we will still need to add the first condition and block
             experiment.conditions[numberCondition].addBlocks(new Block(false));
             if (experiment.Mondrians.Count() == 0)
-                experiment.Mondrians.Add(new Mondrian(0, 0, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
+                experiment.Mondrians.Add("0", new Mondrian("0", 1, true, 5, 15, 5, 15, 5000));       //here we add the default mondrian if the user don't want to make their own 
             experiment.mondsHaveBeenDrawn = false;
             //convert string[] into normal string
             for (int i = 0; i < holderPath.Length; i++)
                 CSVpath += holderPath[i];
             uploadExperiment(CSVpath, numberCondition, numberBlock);
-            uploadErrorText.GetComponent<Text>().text = "Upload Successfull";
-            uploadErrorText.GetComponent<Text>().color = Color.white;
+            if (uploadSuccessfull)
+            {
+                uploadErrorText.GetComponent<Text>().text = "Upload Successfull";
+                uploadErrorText.GetComponent<Text>().color = Color.white;
+            }
         }
         catch (IOException)
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
             uploadErrorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+            experiment.clearExperiment();
             uploadSuccessfull = false;
         }
         catch (IndexOutOfRangeException)
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
             uploadErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+            experiment.clearExperiment();
             uploadSuccessfull = false;
         }
         catch (NullReferenceException)
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
             uploadErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your upload please make sure that conditions, blocks, and trials are in sequential order";
+            experiment.clearExperiment();
             uploadSuccessfull = false;
         }
     }
@@ -235,12 +247,12 @@ public class UIManager : MonoBehaviour
     private void uploadExperiment(string holderPath, int numberCondition, int numberBlock)
     {
         string up = "up", down = "down", left = "left", right = "right";
-        int mond = 0;
+        string mond = "0";
         string mask = "";
         int block0 = 0;             //blocks
         int v = 0;                  //the version or type of trial 0/instruction 1/Trial 2/Break 3/Response
         int trialNumber = 0;        //trial number
-        bool trialRand = false;     //trial randomization
+        int trialRand = 0;     //trial randomization
         bool response = false;              //if the normal trials take in response
         int duration = 0;           //duration of img showing
         int flash = 0;              //flash duration for mondrians
@@ -251,6 +263,7 @@ public class UIManager : MonoBehaviour
         int flashing = 0;          //the time the flashing image is off the screen
         string img2 = "";
         bool responseStop = true;
+        experiment.paletteUploadNeeded = false; 
 
         path = holderPath;
         Debug.Log(path);
@@ -357,7 +370,7 @@ public class UIManager : MonoBehaviour
                                         response = false;
                                         responseStop = true;
                                         flashing = 0;
-                                        mond = 0;
+                                        mond = "0";
                                     }
                                     if (result != numberCondition + 1)      //if the next trial is not the same condition as the privious trial
                                     {                                       //we will add a new condition (we add one because everything is uploaded counting from 1 and not 0
@@ -388,7 +401,7 @@ public class UIManager : MonoBehaviour
                                     trialNumber = result;
                                     break;
                                 case 6:                         //trial.random
-                                    trialRand = Convert.ToBoolean(result);
+                                    trialRand = result;
                                     break;
                                 case 7:                         //trial.image
                                     if (v == 5 || v == 6)
@@ -420,13 +433,13 @@ public class UIManager : MonoBehaviour
                                     {
                                         if (String.IsNullOrEmpty(mondPath) && !String.IsNullOrEmpty(values[i]))     //code has been changed so that the name of the mond file is 
                                         {   //hard coded as mond.csv from the same directory as the upload csv
-                                            mond = Int32.Parse(values[i]);              //take the input 
+                                            mond = values[i];              //take the input 
                                             uploadMondrians();                          //upload the mondrians to the mond array in the experiment holder
                                             experiment.Mondrians[mond].isUsed = true;   //have to upload here because we need to know which mondrians we will use and 
                                         }                                               //it would be ineffient to have to go through the whole experiment later to set this flag
                                         else if (!String.IsNullOrEmpty(values[i]))      //also there is no need to mess with the index because mond 0 is set to be the default mondrian
                                         {                                               //as far as the user knows they will be counting from 1 up 
-                                            mond = Int32.Parse(values[i]);
+                                            mond = values[i];
                                             experiment.Mondrians[mond].isUsed = true;
                                         }
                                     }
@@ -529,8 +542,8 @@ public class UIManager : MonoBehaviour
             //experiment.count++;
             int numOfMonds = 0;
 
-            foreach (Mondrian m in experiment.Mondrians)        //Testing to see how many mondrians are used as the limit is 5
-                if (m.isUsed)
+            foreach (KeyValuePair<string, Mondrian> item in experiment.Mondrians)        //Testing to see how many mondrians are used as the limit is 5
+                if (item.Value.isUsed)
                     ++numOfMonds;
 
             if (numOfMonds > 5)                    //if more than 5 then reset them
@@ -543,11 +556,11 @@ public class UIManager : MonoBehaviour
             experiment.hasUploaded = true;          //set this to true so if there is an error and the file needs to be reuploaded the program will know to clear it beforehand
             experiment.randomizeConditions();       //randomize everything, with be randomized many more times but this is mostly just for checking 
             uploadImages();                    //run the image upload
-            experiment.printExperiment();           //print to the debug screen.
+            //experiment.printExperiment();           //print to the debug screen.
             Debug.Log("uploaded images");
 
             uploadMultiStims();
-            experiment.printExperiment();           //print to the debug screen.
+            //experiment.printExperiment();           //print to the debug screen.
             Debug.Log("uploaded multi stims");
 
             uploadMasks();                     //run the image upload for the mask trials. 
@@ -562,7 +575,7 @@ public class UIManager : MonoBehaviour
         else
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
-            uploadErrorText.GetComponent<Text>().text = "Something was  wrong with the path which was uploaded. ";
+            uploadErrorText.GetComponent<Text>().text = "Something was wrong with the path which was uploaded. ";
             uploadSuccessfull = false;
         }
     }
@@ -601,7 +614,8 @@ public class UIManager : MonoBehaviour
     private void readMondrians()     //exact logic from previous upload 
     {
         Debug.Log(mondPath);
-        int counter = 0, palette = 0, shape = 0, minW = 0, maxW = 0, minH = 0, maxH = 0, Density = 0;
+        int counter = 0, shape = 0, minW = 0, maxW = 0, minH = 0, maxH = 0, Density = 0;
+        string key = "", palette = "0";
         bool pix = false;
         if (mondPath.Length != 0)
         {
@@ -621,41 +635,41 @@ public class UIManager : MonoBehaviour
                     {
                         if (counter > 0)
                         {
-                            int result = 0;
-                            result = Int32.Parse(values[i]);
                             switch (i)
                             {
                                 case 0:                         //here we make our default mondrain and take in the palette
                                     if (counter > 1)
-                                        experiment.Mondrians.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
-                                    palette = result;
+                                        experiment.Mondrians.Add(key, new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
+                                    key = values[i];
                                     break;
                                 case 1:                         //here we take in the shape
-                                    palette = result;
+                                    if (values[i] != "0")
+                                        experiment.paletteUploadNeeded = true; 
+                                    palette = values[i];
                                     break;
                                 case 2:
-                                    shape = result;
+                                    shape = Int32.Parse(values[i]);
                                     break;
                                 case 3:                         //minimum width
-                                    if (result == 0)
+                                    if (Int32.Parse(values[i]) == 0)
                                         pix = false;
                                     else
                                         pix = true;
                                     break;
                                 case 4:
-                                    minW = result;
+                                    minW = Int32.Parse(values[i]);
                                     break;
                                 case 5:                         //maximum width
-                                    maxW = result;
+                                    maxW = Int32.Parse(values[i]);
                                     break;
                                 case 6:                         //minimum height
-                                    minH = result;
+                                    minH = Int32.Parse(values[i]);
                                     break;
                                 case 7:                         //maximum height
-                                    maxH = result;
+                                    maxH = Int32.Parse(values[i]);
                                     break;
                                 case 8:                         //density
-                                    Density = result;
+                                    Density = Int32.Parse(values[i]);
                                     break;
                             }
                         }
@@ -664,7 +678,7 @@ public class UIManager : MonoBehaviour
                 }
                 sr.Close();
             }
-            experiment.Mondrians.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
+            experiment.Mondrians.Add(key, new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
         }
     }
 
@@ -687,7 +701,7 @@ public class UIManager : MonoBehaviour
         {
             imagePath = imagePath.Remove(imagePath.Length - 1, 1);
         }
-        experiment.directory = imagePath;
+        experiment.csvOriginDirectory = imagePath;
         Debug.Log(imagePath);
         imagePath += "Stimuli\\";                           //all images will be in the same directory in a file named stimuli
         holderImagePath = imagePath;                                                                //save the image path somewhere else as imagepath will be manipulated throughout the algorthem 
@@ -1240,19 +1254,32 @@ public class UIManager : MonoBehaviour
     }
 
     //---------------------------------------------------Path Input--------------------------------------------------------
-    public void inputPath()
+    public void inputOutputPath()
     {
-        Debug.Log(outputPathInputfield.GetComponent<Text>().text);
-        if (Directory.Exists(outputPathInputfield.GetComponent<Text>().text))
+        string[] stringHolderPath;
+        string holderPath = "";
+        try
         {
-            experiment.outputPath = outputPathInputfield.GetComponent<Text>().text;
-            outputPathErrorText.GetComponent<Text>().color = Color.white;
-            outputPathErrorText.GetComponent<Text>().text = experiment.outputPath;
+            stringHolderPath = SFB.StandaloneFileBrowser.OpenFolderPanel("Open File", "", false);
+            foreach (var i in stringHolderPath)
+                holderPath += i;
+            Debug.Log(holderPath);
+            experiment.outputPath = holderPath;
         }
-        else
+        catch (IOException)
         {
             outputPathErrorText.GetComponent<Text>().color = Color.red;
-            outputPathErrorText.GetComponent<Text>().text = "Could not find directory";
+            outputPathErrorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+        }
+        catch (IndexOutOfRangeException)
+        {
+            outputPathErrorText.GetComponent<Text>().color = Color.red;
+            outputPathErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (IOOR)";
+        }
+        catch (NullReferenceException)
+        {
+            outputPathErrorText.GetComponent<Text>().color = Color.red;
+            outputPathErrorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (NRE)";
         }
     }
 
@@ -1379,6 +1406,7 @@ public class UIManager : MonoBehaviour
     }
 
     //for testing the mondrians
+    /*
     public void testingMondrian()
     {   //Mondrian(int palette, int sh, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
         List<Mondrian> m = new List<Mondrian>();
@@ -1439,5 +1467,6 @@ public class UIManager : MonoBehaviour
             Debug.Log("Mixed");
         }
     }
+    */
 }
 
