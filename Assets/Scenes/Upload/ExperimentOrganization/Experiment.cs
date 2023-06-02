@@ -16,12 +16,15 @@ public class Experiment                                                 //Final 
     public bool mondsHaveBeenDrawn;                 //if the mondrians have been drawn yet
     public int sceneToBeLoaded;                     //the next scene that will be loaded
     public string path;                             //output path which is uploaded with the experiment
-    public string directory;                        //directory where the csv came from
+    public string csvOriginDirectory;                        //directory where the csv came from
     public string inputPath;                        //path where the original csv was uploaded from
     public int count;                               //the number of trials
     public string palettePath;                      //the path of the palette
     public string outputPath;
+    public bool paletteUploadNeeded; 
     public string[] args;
+    private static Experiment instance;
+    public Dictionary<string, Mondrian> Mondrians;
     public static Experiment current
     {
         get
@@ -32,27 +35,25 @@ public class Experiment                                                 //Final 
         }
     }
 
-    private static Experiment instance;
-
-    public List<Mondrian> Mondrians;
     //---------------------------------------------------------Functions----------------------------------------------------------------------------------------------------------
     public Experiment()                                                 //default constructor                                                                                               
     {                                                                   //                                                                                                                  
         numberOfConditions = 0;                                         //set the number of conditions to 0                                                                                 
         conditions = new List<Condition>();
         index = new List<int>();
-        Mondrians = new List<Mondrian>();
+        Mondrians = new Dictionary<string, Mondrian>();
         right = left = false;
         ID = "";
         hasUploaded = false;
         mondsHaveBeenDrawn = false;
         successfulUpload = false;
+        paletteUploadNeeded = false; 
         sceneToBeLoaded = 0;
         path = "";
         inputPath = "";
         count = 0;
         outputPath = "";
-        directory = "";
+        csvOriginDirectory = "";
         args = Array.Empty<string>();
     }
     public void addCondition(Condition C)                               //adding a new condition to the main array of conditions                                                            
@@ -102,11 +103,9 @@ public class Experiment                                                 //Final 
     public void printMondrians()
     {
         Debug.Log("Printing mondrians... ----------------------------");
-        for (int i = 0; i < Mondrians.Count; ++i)
+        foreach (KeyValuePair<string,Mondrian> item in Mondrians)
         {
-            Debug.Log("Mond number: " + i + " start ------------------------");
-            Mondrians[i].printMond();
-            Debug.Log("Mond number: " + i + " end ------------------------");
+            item.Value.printMond();
         }
         Debug.Log("End of printint mondrians ------------------------");
     }
@@ -138,6 +137,8 @@ public class Experiment                                                 //Final 
                     index[x] = holder;                             //swap x and i                                                   
                 }
             }
+        else
+            conditions[0].randomizeBlocks();
     }
 }
 

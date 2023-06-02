@@ -3,13 +3,13 @@ public abstract class Item
 {
     public bool hasMultipleStims { get; private set; }
     public int block { get; private set; }                            //organizational blocks, all trials labeled 1 go together in a single block  
-    public bool random { get; private set; }                          //1 for a random sequence and 0 for no randomization                                                                                                            
+    public int random { get; private set; }                          //1 for a random sequence and 0 for no randomization                                                                                                            
     public string image { get; set; }                          //string to store the name of image                                                                               
     public string imagePath { get; set; }                               //file path to image
     public string image2 { get; set; }
     public string image2Path { get; set; }
 
-    public Item(bool rand, int blk, string img, bool multi, string img2)
+    public Item(int rand, int blk, string img, bool multi, string img2)
     {
         random = rand;
         block = blk;
@@ -30,7 +30,7 @@ public class MondTrial : Item
     public float opacity { get; private set; }                          //% opacity to reach by the end of the trial                                                            
     public int maskDelay { get; private set; }                            //delay before the image appears                      
     public int staticDelay { get; private set; } //the time it will take to reach the given opacity in ms  
-    public int mond { get; private set; }
+    public string mond { get; private set; }
     public string left { get; private set; }
     public string right { get; private set; }
     public string up { get; private set; }
@@ -40,7 +40,7 @@ public class MondTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public MondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -93,7 +93,7 @@ public class FlashMondTrial : Item
     public float opacity { get; private set; }                          //% opacity to reach by the end of the trial                                                            
     public int maskDelay { get; private set; }                            //delay before the image appears                      
     public int staticDelay { get; private set; } //the time it will take to reach the given opacity in ms  
-    public int mond { get; private set; }           //which mond the trial uses
+    public string mond { get; private set; }           //which mond the trial uses
     public float flashPeriod { get; private set; }
     public string left { get; private set; }       //if the trial takes in response what are the responses
     public string right { get; private set; }
@@ -104,7 +104,7 @@ public class FlashMondTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public FlashMondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -171,7 +171,7 @@ public class MaskTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public MaskTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -224,7 +224,7 @@ public class Instruction : Item
 {
     public int duration;
     public float responseTime;
-    public Instruction(bool rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
+    public Instruction(int rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
     {
         duration = dur;
         responseTime = 0;
@@ -247,7 +247,7 @@ public class Response : Item
 {
     public string up, down, left, right, response;
     public float responseTime;
-    public Response(bool rand, int blk, string img, string u, string d, string l, string r) : base(rand, blk, img, false, "")
+    public Response(int rand, int blk, string img, string u, string d, string l, string r) : base(rand, blk, img, false, "")
     {
         up = u;
         down = d;
@@ -275,7 +275,7 @@ public class Response : Item
 public class Break : Item
 {
     public int duration;
-    public Break(bool rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
+    public Break(int rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
     {
         duration = dur;
     }

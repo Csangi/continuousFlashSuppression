@@ -2,7 +2,7 @@
 
 public class Mondrian
 {
-    public int palette { get; set; }
+    public string palette { get; set; }
     public Shape shape { get; set; }
     public int maxWidth { get; set; }
     public int minWidth { get; set; }
@@ -13,30 +13,30 @@ public class Mondrian
     public int minRange { get; set; }       //this refers how far in the line of mondrians this one appears in the mond array
     public int maxRange { get; set; }
     public bool addPixelated { get; set; }
-    public Mondrian(int palette, int sh, bool pix, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
+    public Mondrian(string palette, int sh, bool pix, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
     {
         this.palette = palette;
         switch (sh)
         {
-            case 0:
+            case 1:
                 this.shape = Shape.ellipse;
                 break;
-            case 1:
+            case 2:
                 this.shape = Shape.rectangle;
                 break;
-            case 2:
+            case 3:
                 this.shape = Shape.triangle;
                 break;
-            case 3:
+            case 4:
                 this.shape = Shape.pixelated;
                 break;
-            case 4:
+            case 5:
                 this.shape = Shape.circle;
                 break;
-            case 5:
+            case 6:
                 this.shape = Shape.square;
                 break;
-            case 6:
+            case 7:
                 this.shape = Shape.mixed;
                 break;
             default:
