@@ -19,7 +19,12 @@ public class MondrianBuilder : MonoBehaviour
     private bool savingMond, mondDrawn;
     private string outputPath = "";
     private string folderName = "";
-    public Dropdown paletteDropdown;
+    public Dropdown paletteDropdown, maskDropdown, shapeDropdown;
+    public InputField minH, maxH, minW, maxW, DensityIF;
+    List<Mondrian> MondList = new List<Mondrian>();
+    List<string> colorPalettenames = new List<string>();
+    public Toggle pixels;
+
 
     void Start()
     {
@@ -33,6 +38,77 @@ public class MondrianBuilder : MonoBehaviour
     public void changePalette(int pal)
     {
         palette = pal;
+    }
+
+    public void useMask(int m)
+    {
+        int holder = colorPalettenames.IndexOf(MondList[m].palette);
+        if (holder != -1)
+        {
+            palette = holder;
+            paletteDropdown.value = holder;
+        }
+        else
+        {
+            palette = 0;
+            paletteDropdown.value = 0;
+        }
+
+        switch (MondList[m].shape)
+        {
+            case Shape.ellipse:
+                sh = 0;
+                shapeDropdown.value = 0;
+                break;
+            case Shape.rectangle:
+                sh = 1;
+                shapeDropdown.value = 1;
+                break;
+            case Shape.triangle:
+                sh = 2;
+                shapeDropdown.value = 2;
+                break;
+            case Shape.pixelated:
+                sh = 3;
+                shapeDropdown.value = 3;
+                break;
+            case Shape.circle:
+                sh = 4;
+                shapeDropdown.value = 4;
+                break;
+            case Shape.square:
+                sh = 5;
+                shapeDropdown.value = 5;
+                break;
+            case Shape.mixed:
+                sh = 6;
+                shapeDropdown.value = 6;
+                break;
+            default:
+                sh = 0;
+                shapeDropdown.value = 0;
+                break;
+        }
+
+        pixels.isOn = MondList[m].addPixelated;
+        pix = MondList[m].addPixelated;
+
+        minHeight = MondList[m].minHeight;
+        minH.text = MondList[m].minHeight.ToString();
+
+        maxHeight = MondList[m].maxHeight;
+        maxH.text = MondList[m].maxHeight.ToString();
+
+        minWidth = MondList[m].minWidth;
+        minW.text = MondList[m].minWidth.ToString();
+
+        maxWidth = MondList[m].maxWidth;
+        maxW.text = MondList[m].maxWidth.ToString();
+
+        density = MondList[m].density;
+        DensityIF.text = MondList[m].density.ToString();
+
+        runMondrianCreator();
     }
 
     public void changeShape(int shape)
@@ -261,7 +337,7 @@ public class MondrianBuilder : MonoBehaviour
         colors.Add(row);
     }
 
-    public void uploadButton()
+    public void uploadPaletteButton()
     {
         string[] holderPath;
         string path = "";
@@ -289,6 +365,107 @@ public class MondrianBuilder : MonoBehaviour
         }
     }
 
+    public void uploadMasksButton()
+    {
+        string[] holderPath;
+        string path = "";
+        try
+        {
+            holderPath = SFB.StandaloneFileBrowser.OpenFilePanel("Open File", "", "csv", true);
+            foreach (var i in holderPath)
+                path += i;
+            readMondrians(path);
+        }
+        catch (IOException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "There was an error with the upload (make sure that the csv is closed in all editors, the file cannot be read from 2 places at once";
+        }
+        catch (IndexOutOfRangeException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (IOOR)";
+        }
+        catch (NullReferenceException)
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Something was wrong with the formating of your path upload (NRE)";
+        }
+    }
+
+    private void readMondrians(string mondPath)     //exact logic from previous upload 
+    {
+        Debug.Log(mondPath);
+        maskDropdown.options.Clear();
+        int counter = 0, shape = 0, minW = 0, maxW = 0, minH = 0, maxH = 0, Density = 0;
+        string key = "", palette = "0";
+        bool pix = false;
+        if (mondPath.Length != 0)
+        {
+            using (var sr = new StreamReader(mondPath))
+            {
+                bool EOF = false;
+                while (!EOF)
+                {
+                    string data = sr.ReadLine();
+                    if (data == null)
+                    {
+                        EOF = true;
+                        break;
+                    }
+                    var values = data.Split(',');
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        if (counter > 0)
+                        {
+                            switch (i)
+                            {
+                                case 0:                         //here we make our default mondrain and take in the palette
+                                    if (counter > 1)
+                                    {
+                                        MondList.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
+                                        maskDropdown.options.Add(new Dropdown.OptionData(key));
+                                    }
+                                    key = values[i];
+                                    break;
+                                case 1:                         //here we take in the shape
+                                    palette = values[i];
+                                    break;
+                                case 2:
+                                    shape = Int32.Parse(values[i]);
+                                    break;
+                                case 3:                         //minimum width
+                                    if (Int32.Parse(values[i]) == 0)
+                                        pix = false;
+                                    else
+                                        pix = true;
+                                    break;
+                                case 4:
+                                    minW = Int32.Parse(values[i]);
+                                    break;
+                                case 5:                         //maximum width
+                                    maxW = Int32.Parse(values[i]);
+                                    break;
+                                case 6:                         //minimum height
+                                    minH = Int32.Parse(values[i]);
+                                    break;
+                                case 7:                         //maximum height
+                                    maxH = Int32.Parse(values[i]);
+                                    break;
+                                case 8:                         //density
+                                    Density = Int32.Parse(values[i]);
+                                    break;
+                            }
+                        }
+                    }
+                    counter++;
+                }
+                sr.Close();
+            }
+            MondList.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
+            maskDropdown.options.Add(new Dropdown.OptionData(key));
+        }
+    }
 
     public void uploadFolderButton()
     {
@@ -324,8 +501,11 @@ public class MondrianBuilder : MonoBehaviour
         colors.Clear();
         setColorValues();
         paletteDropdown.options.Clear();
+        colorPalettenames.Clear();
         paletteDropdown.options.Add(new Dropdown.OptionData("Neon"));
         paletteDropdown.options.Add(new Dropdown.OptionData("Black & White"));
+        colorPalettenames.Add("Neon");
+        colorPalettenames.Add("Black & White");
         int counter = 0, red = -1, green = -1, blue = -1;
         string name = "";
         List<Color> row = new List<Color>();
@@ -386,6 +566,7 @@ public class MondrianBuilder : MonoBehaviour
                         colors.Add(row);
                         row = new List<Color>();
                         paletteDropdown.options.Add(new Dropdown.OptionData(name));
+                        colorPalettenames.Add(name);
                     }               //add the drop down option
                     counter++;
                     Debug.Log("counter = " + counter);

@@ -36,11 +36,13 @@ public class MondTrial : Item
     public string up { get; private set; }
     public string down { get; private set; }
     public string response { get; set; }
+    public int timeToReachOpacity { get; set; }
+    public int quadrant { get; set; }
     public string responseTime { get; set; }
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public MondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -56,6 +58,8 @@ public class MondTrial : Item
         isResponse = resp;
         responseStop = stop;
         response = responseTime = "";
+        timeToReachOpacity = TTRO;
+        quadrant = quad;
     }
 
     public override void printTrial()
@@ -74,6 +78,8 @@ public class MondTrial : Item
         Debug.Log("static delay = " + staticDelay + "\n");
         Debug.Log("Mondrian number = " + mond + "\n");
         Debug.Log("Response = " + isResponse + "\n");
+        Debug.Log("Time to Reach Opacity = " + timeToReachOpacity + "\n");
+        Debug.Log("quadrant = " + quadrant + "\n");
         if (isResponse)
         {
             Debug.Log("Left = " + left + "\n");
@@ -99,12 +105,14 @@ public class FlashMondTrial : Item
     public string right { get; private set; }
     public string up { get; private set; }
     public string down { get; private set; }
+    public int timeToReachOpacity { get; set; }
+    public int quadrant { get; set; }
     public string response { get; set; }
     public string responseTime { get; set; }
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public FlashMondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public FlashMondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -121,6 +129,8 @@ public class FlashMondTrial : Item
         isResponse = resp;
         responseStop = stop;
         response = responseTime = "";
+        timeToReachOpacity = TTRO;
+        quadrant = quad;
     }
     //debug print statement for error checking
     public override void printTrial()
@@ -140,6 +150,8 @@ public class FlashMondTrial : Item
         Debug.Log("Mondrian number = " + mond + "\n");
         Debug.Log("Flash Period = " + flashPeriod + "\n");
         Debug.Log("Response = " + isResponse + "\n");
+        Debug.Log("Time to Reach Opacity = " + timeToReachOpacity + "\n");
+        Debug.Log("quadrant = " + quadrant + "\n");
         if (isResponse)
         {
             Debug.Log("Left = " + left + "\n");
@@ -166,12 +178,14 @@ public class MaskTrial : Item
     public string right { get; private set; }
     public string up { get; private set; }
     public string down { get; private set; }
+    public int timeToReachOpacity { get; set; }
+    public int quadrant { get; set; }
     public string response { get; set; }
     public string responseTime { get; set; }
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MaskTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
+    public MaskTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -189,6 +203,8 @@ public class MaskTrial : Item
         isResponse = resp;
         responseStop = stop;
         response = responseTime = "";
+        timeToReachOpacity = TTRO;
+        quadrant = quad;
     }
 
     public override void printTrial()
@@ -208,6 +224,8 @@ public class MaskTrial : Item
         Debug.Log("Mask name = " + mask + "\n");
         Debug.Log("Flash period = " + flashPeriod + "\n");
         Debug.Log("Response = " + isResponse + "\n");
+        Debug.Log("Time to Reach Opacity = " + timeToReachOpacity + "\n");
+        Debug.Log("quadrant = " + quadrant + "\n");
         if (isResponse)
         {
             Debug.Log("Left = " + left + "\n");
