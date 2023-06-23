@@ -4312,6 +4312,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bcb5b964ecf73b44adecab41a81240f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rightPicImageGO: {fileID: 2114559145}
+  leftPicImageGO: {fileID: 923296793}
+  leftMultiPicImage1GO: {fileID: 1314998257}
+  leftMultiPicImage2GO: {fileID: 785727028}
+  rightMultiPicImage1GO: {fileID: 1760210790}
+  rightMultiPicImage2GO: {fileID: 2098622807}
   progress: {fileID: 1826586267}
   progressText: {fileID: 613729688}
   rightImgArr:

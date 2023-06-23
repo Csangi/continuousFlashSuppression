@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class ExperimentRunner : MonoBehaviour
 {
-
+    public GameObject rightPicImageGO, leftPicImageGO, leftMultiPicImage1GO, leftMultiPicImage2GO, rightMultiPicImage1GO, rightMultiPicImage2GO;
     public Experiment exp = Experiment.current;
     public Image progress;
     public GameObject progressText;
@@ -73,7 +73,7 @@ public class ExperimentRunner : MonoBehaviour
         exp.randomizeConditions();                                                                                                      //randomizing the experiment incase user returns and doesnt upload a new csv
         Debug.Log("number of conditions: " + exp.numberOfConditions);
         exp.printExperiment();
-        exit = false;
+        exit = false; 
     }
 
     //using web request to get images from the users file system
@@ -102,9 +102,9 @@ public class ExperimentRunner : MonoBehaviour
         {
             Debug.Log("Trying to run experiment " + expIsRunning + " " + left + " " + right);
             if (left && !expIsRunning)
-                StartCoroutine(runExperiment(rightPicImage, leftImgArr));       //start the experiment sending the different images
+                StartCoroutine(runExperiment(rightPicImage, rightPicImageGO, rightMultiPicImage1, rightMultiPicImage1GO, rightMultiPicImage2, rightMultiPicImage2GO, leftPicImage, leftImgArr));       //start the experiment sending the different images
             else if (right && !expIsRunning)
-                StartCoroutine(runExperiment(leftPicImage, rightImgArr));
+                StartCoroutine(runExperiment(leftPicImage, leftPicImageGO, leftMultiPicImage1, leftMultiPicImage1GO, leftMultiPicImage2, leftMultiPicImage2GO, rightPicImage, rightImgArr));
             else
                 introResponse = true;
         }
@@ -184,22 +184,8 @@ public class ExperimentRunner : MonoBehaviour
 
         }
     }
-    IEnumerator runExperiment(RawImage changeImage, RawImage[] ImgArr)
+    IEnumerator runExperiment(RawImage changeImage, GameObject changeImageGO, RawImage multiImage1, GameObject multiImage1GO, RawImage multiImage2, GameObject multiImage2GO, RawImage oppositeChangeImage, RawImage[] ImgArr)
     {
-        RawImage oppositeChangeImage, multiImage1, multiImage2;
-        if (changeImage == rightPicImage)
-        {
-            oppositeChangeImage = leftPicImage;
-            multiImage1 = rightMultiPicImage1;
-            multiImage2 = rightMultiPicImage2;
-        }
-        else
-        {
-            oppositeChangeImage = rightPicImage;
-            multiImage1 = leftMultiPicImage1;
-            multiImage2 = leftMultiPicImage2;
-        }
-
         float percentAmount = 0;
         expIsRunning = true;
         int counter = 0;
@@ -227,18 +213,22 @@ public class ExperimentRunner : MonoBehaviour
                             picIsUploaded = false;
                             StartCoroutine(MyGetTexture(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].image2Path, multiImage2));
                             yield return new WaitUntil(() => picIsUploaded);
-                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial, multiImage1, multiImage2, ImgArr));
+                            moveToQuadrant(multiImage1GO, multiImage2GO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial).quadrant);
+                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial, multiImage1, multiImage2, multiImage1GO, multiImage2GO, ImgArr));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(multiImage1GO, multiImage2GO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                         else
                         {
                             StartCoroutine(MyGetTexture(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].imagePath, changeImage));
                             yield return new WaitUntil(() => picIsUploaded);
-
-                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial, changeImage, ImgArr));
+                            Debug.Log("this quadrant is " + (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial).quadrant);
+                            moveToQuadrant(changeImageGO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial).quadrant);
+                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MondTrial, changeImage, changeImageGO, ImgArr));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(changeImageGO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                     }
                     else if (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] is FlashMondTrial)
@@ -250,18 +240,21 @@ public class ExperimentRunner : MonoBehaviour
                             picIsUploaded = false;
                             StartCoroutine(MyGetTexture(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].image2Path, multiImage2));
                             yield return new WaitUntil(() => picIsUploaded);
-                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial, multiImage1, multiImage2, ImgArr));
+                            moveToQuadrant(multiImage1GO, multiImage2GO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial).quadrant);
+                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial, multiImage1, multiImage2, multiImage1GO, multiImage2GO, ImgArr));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(multiImage1GO, multiImage2GO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                         else
                         {
                             StartCoroutine(MyGetTexture(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].imagePath, changeImage));
                             yield return new WaitUntil(() => picIsUploaded);
-
-                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial, changeImage, ImgArr));
+                            moveToQuadrant(changeImageGO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial).quadrant);
+                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as FlashMondTrial, changeImage, changeImageGO, ImgArr));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(changeImageGO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                     }
                     else if (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] is MaskTrial)
@@ -277,10 +270,11 @@ public class ExperimentRunner : MonoBehaviour
                             Debug.Log((exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).maskPath);
                             StartCoroutine(MyGetTexture((exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).maskPath, oppositeChangeImage));
                             yield return new WaitUntil(() => picIsUploaded);
-
-                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial, multiImage1, multiImage2, oppositeChangeImage, ImgArr));
+                            moveToQuadrant(multiImage1GO, multiImage2GO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).quadrant);
+                            StartCoroutine(runMultiTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial, multiImage1, multiImage2, multiImage1GO, multiImage2GO, oppositeChangeImage));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(multiImage1GO, multiImage2GO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                         else
                         {
@@ -290,10 +284,11 @@ public class ExperimentRunner : MonoBehaviour
                             Debug.Log((exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).maskPath);
                             StartCoroutine(MyGetTexture((exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).maskPath, oppositeChangeImage));
                             yield return new WaitUntil(() => picIsUploaded);
-
-                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial, changeImage, oppositeChangeImage, ImgArr));
+                            moveToQuadrant(changeImageGO, (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial).quadrant);
+                            StartCoroutine(runTrial(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as MaskTrial, changeImage, changeImageGO, oppositeChangeImage));
                             yield return new WaitUntil(() => trialHasRun);
-                            yield return new WaitForSecondsRealtime(1);
+                            moveToQuadrant(changeImageGO, 0);
+                            //yield return new WaitForSecondsRealtime(1);
                         }
                     }
                     else if (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] is Response)
@@ -304,7 +299,7 @@ public class ExperimentRunner : MonoBehaviour
 
                         StartCoroutine(runResponse(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as Response, rightPicImage, leftPicImage));
                         yield return new WaitUntil(() => trialHasRun);
-                        yield return new WaitForSecondsRealtime(1);
+                        //yield return new WaitForSecondsRealtime(1);
                     }
                     else if (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] is Instruction)
                     {
@@ -314,7 +309,7 @@ public class ExperimentRunner : MonoBehaviour
 
                         StartCoroutine(runInstruction(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as Instruction, rightPicImage, leftPicImage));
                         yield return new WaitUntil(() => trialHasRun);
-                        yield return new WaitForSecondsRealtime(1);
+                        //yield return new WaitForSecondsRealtime(1);
                     }
                     else if (exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] is Break)
                     {
@@ -324,7 +319,7 @@ public class ExperimentRunner : MonoBehaviour
 
                         StartCoroutine(runBreak(exp.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex] as Break, rightPicImage, leftPicImage));
                         yield return new WaitUntil(() => trialHasRun);
-                        yield return new WaitForSecondsRealtime(1);
+                        //yield return new WaitForSecondsRealtime(1);
                     }
 
                     if (exit)
@@ -336,6 +331,93 @@ public class ExperimentRunner : MonoBehaviour
         }
         expIsRunning = false;
     }
+
+    //this funciton changes the location of the image to the quadrant of the user's choosing
+    private void moveToQuadrant(GameObject changeimage, int quad)
+    {
+        if (quad == 6 || quad == 7)
+            quad = UnityEngine.Random.Range(1, 6);
+        switch (quad)
+        {
+            case 0:
+                changeimage.transform.localScale = new Vector2(1f, 1f);
+                changeimage.transform.localPosition = new Vector3(0, 0, 0);
+                break;
+            case 1:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                changeimage.transform.localPosition = new Vector3(-25f, 25f, 0);
+                break;
+            case 2:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                changeimage.transform.localPosition = new Vector3(25f, 25f, 0);
+                break;
+            case 3:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                changeimage.transform.localPosition = new Vector3(-25f, -25f, 0);
+                break;
+            case 4:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                changeimage.transform.localPosition = new Vector3(25f, -25f, 0);
+                break;
+            case 5:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                changeimage.transform.localPosition = new Vector3(0, 0, 0);
+                break;
+            case 8:
+            case 9:
+                changeimage.transform.localScale = new Vector2(.5f, .5f);
+                float x = UnityEngine.Random.Range(-25, 25);
+                float y = UnityEngine.Random.Range(-25, 25);
+                changeimage.transform.localPosition = new Vector3(x, y, 0);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void moveToQuadrant(GameObject changeimage1, GameObject changeimage2, int quad)
+    {
+        if (quad == 6 || quad == 7)
+            quad = UnityEngine.Random.Range(0, 6);
+        switch (quad)
+        {
+            case 0:
+                changeimage1.transform.localPosition = new Vector3(-25f, 0, 0);
+                changeimage2.transform.localPosition = new Vector3(25f, 0, 0);
+                break;
+            case 1:
+                changeimage1.transform.localPosition = new Vector3(-25f, 25f, 0);
+                changeimage2.transform.localPosition = new Vector3(25f, 25f, 0);
+                break;
+            case 2:
+                changeimage1.transform.localPosition = new Vector3(-25f, -25f, 0);
+                changeimage2.transform.localPosition = new Vector3(25f, -25f, 0);
+                break;
+            case 3:
+                changeimage1.transform.localPosition = new Vector3(-25f, 25f, 0);
+                changeimage2.transform.localPosition = new Vector3(-25f, -25f, 0);
+                break;
+            case 4:
+                changeimage1.transform.localPosition = new Vector3(0, 25f, 0);
+                changeimage2.transform.localPosition = new Vector3(0, -25f, 0);
+                break;
+            case 5:
+                changeimage1.transform.localPosition = new Vector3(25f, 25f, 0);
+                changeimage2.transform.localPosition = new Vector3(25f, -25f, 0);
+                break;
+            case 8:
+            case 9:
+                float x = UnityEngine.Random.Range(-25, 25);
+                float y = UnityEngine.Random.Range(-25, 25);
+                changeimage1.transform.localPosition = new Vector3(x, y, 0);
+                x = UnityEngine.Random.Range(-25, 25);
+                y = UnityEngine.Random.Range(-25, 25);
+                changeimage2.transform.localPosition = new Vector3(x, y, 0);
+                break;
+        }
+    }
+
+
 
     //A break is like a instruction, but there is no response
     IEnumerator runBreak(Break I, RawImage changeImage1, RawImage changeImage2)
@@ -393,29 +475,33 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runTrial(MondTrial T, RawImage changeImage, RawImage[] ImgArr)
+    IEnumerator runTrial(MondTrial T, RawImage changeImage, GameObject changeImageGO, RawImage[] ImgArr)
     {
         changeImage.color = new Color(0f, 0f, 0f, 0f);
         changeImage.enabled = true;
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / (float)iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (float)(numOfIt - iStaticDelay)) / 100;
         int holder = 0, x = 0;   //holds the last index in the array that is currently active
         float waitingPeriod = (float)T.flashDuration / 1000;        //the time between each waiting
         response = false;        //set the responses and which arrow to false 
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
         Debug.Log("running a trial");
         Debug.Log("opacity increase: " + opacityIncrease);
         Debug.Log("waiting period: " + waitingPeriod);
@@ -424,9 +510,26 @@ public class ExperimentRunner : MonoBehaviour
         startTimer = true;
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
+            if (exit)           //if trial exited
+                yield break;
+
+            if (response && T.isResponse && T.responseStop)     //if the trial is a response
+                break;
+
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImageGO, T.quadrant);
+
             if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
             {   //each new mondrian will be found using a do while loop
                 Debug.Log("-------> " + iMaskDelay);
+                //once i reaches the flash delay it will begin fading in the image
+                if (i >= iStaticDelay && opacity < T.opacity / 100)
+                {
+                    Debug.Log("-------> " + opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage.color = new Color(opacity, opacity, opacity, opacity);
+                }
                 do
                 {
                     x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
@@ -435,21 +538,6 @@ public class ExperimentRunner : MonoBehaviour
                 ImgArr[holder].enabled = false;
                 holder = x;
             }
-            //once i reaches the flash delay it will begin fading in the image
-            if (i >= iStaticDelay)
-            {
-                Debug.Log("-------> " + opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage.color = new Color(opacity, opacity, opacity, opacity);
-            }
-
-            if (exit)           //if trial exited
-                yield break;
-
-            if (response && T.isResponse && T.responseStop)     //if the trial is a response
-                break;
-
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
             Debug.Log(i + " " + x);
         }
@@ -474,19 +562,28 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runTrial(FlashMondTrial T, RawImage changeImage, RawImage[] ImgArr)
+    IEnumerator runTrial(FlashMondTrial T, RawImage changeImage, GameObject changeImageGO, RawImage[] ImgArr)
     {
         changeImage.color = new Color(0f, 0f, 0f, 0f);
         changeImage.enabled = true;
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
@@ -500,44 +597,41 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("waiting Period: " + waitingPeriod);
         Debug.Log("iMask Delay: " + iMaskDelay);
         Debug.Log("num of Iterations: " + numOfIt);
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
         startTimer = true;
         Debug.Log("running a trial");
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
-            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
-            {   //each new mondrian will be found using a do while loop
-                do
-                {
-                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
-                } while (x == holder);
-                ImgArr[holder].enabled = false;
-                changeImage.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                changeImage.enabled = true;
-                ImgArr[x].enabled = true;
-                holder = x;
-            }
-            //once i reaches the flash delay it will begin fading in the image
-            if (i >= iStaticDelay)
-            {
-                Debug.Log(opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage.color = new Color(opacity, opacity, opacity, opacity);
-            }
-
             if (exit)           //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
-            yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImageGO, T.quadrant);
+
+            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
+            {   //each new mondrian will be found using a do while loop
+                //once i reaches the flash delay it will begin fading in the image
+                if (i >= iStaticDelay && opacity < T.opacity / 100)
+                {
+                    Debug.Log(opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage.color = new Color(opacity, opacity, opacity, opacity);
+                }
+                yield return new WaitForSecondsRealtime(waitingPeriod);
+                do
+                {
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                } while (x == holder);
+                ImgArr[holder].enabled = changeImage.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                changeImage.enabled = ImgArr[x].enabled = true;
+                holder = x;
+            }
+            else
+                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
             Debug.Log(i + " " + x);
         }
         if (T.isResponse)
@@ -561,64 +655,71 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runTrial(MaskTrial T, RawImage changeImage, RawImage oppositeChangeImage, RawImage[] ImgArr)
+    IEnumerator runTrial(MaskTrial T, RawImage changeImage, GameObject changeImageGO, RawImage oppositeChangeImage)
     {
         changeImage.color = new Color(0f, 0f, 0f, 0f);
-        changeImage.enabled = true;
-        oppositeChangeImage.enabled = true;
+        changeImage.enabled = false;
+        oppositeChangeImage.enabled = false;
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
         response = false;        //set the responses and which arrow to false 
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
+        Debug.Log("Trial values:");
+        Debug.Log("Static Delay: " + iStaticDelay);
+        Debug.Log("opacity Increase: " + opacityIncrease);
+        Debug.Log("flash Period: " + flashPeriod);
+        Debug.Log("waiting Period: " + waitingPeriod);
+        Debug.Log("iMask Delay: " + iMaskDelay);
+        Debug.Log("num of Iterations: " + numOfIt);
         Debug.Log("running a trial");
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
         startTimer = true;
         Debug.Log("running a trial" + flashPeriod + " " + waitingPeriod);
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
-            if (i >= iStaticDelay) //once i reaches the flash delay it will begin fading in the image
-            {
-                Debug.Log(opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage.enabled = false;
-                oppositeChangeImage.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                oppositeChangeImage.enabled = true;
-                changeImage.enabled = true;
-                changeImage.color = new Color(opacity, opacity, opacity, opacity);
-            }
-            else if (i >= iMaskDelay)
-            {
-                changeImage.enabled = false;
-                oppositeChangeImage.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                oppositeChangeImage.enabled = true;
-                changeImage.enabled = true;
-            }
-
-
             if (exit)           //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
-            yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImageGO, T.quadrant);
+
+            if (i >= iMaskDelay)
+            {
+                if (i >= iStaticDelay && opacity < T.opacity / 100) //once i reaches the flash delay it will begin fading in the image
+                {
+                    Debug.Log(opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage.color = new Color(opacity, opacity, opacity, opacity);
+                }
+                yield return new WaitForSecondsRealtime(waitingPeriod);
+                changeImage.enabled = oppositeChangeImage.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                oppositeChangeImage.enabled = changeImage.enabled = true;
+            }
+            else
+                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
             Debug.Log(i);
         }
         if (T.isResponse)
@@ -642,7 +743,7 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runMultiTrial(MondTrial T, RawImage changeImage1, RawImage changeImage2, RawImage[] ImgArr)
+    IEnumerator runMultiTrial(MondTrial T, RawImage changeImage1, RawImage changeImage2, GameObject changeImage1GO, GameObject changeImage2GO, RawImage[] ImgArr)
     {
         changeImage1.color = new Color(0f, 0f, 0f, 0f);
         changeImage2.color = new Color(0f, 0f, 0f, 0f);
@@ -651,54 +752,64 @@ public class ExperimentRunner : MonoBehaviour
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float waitingPeriod = (float)T.flashDuration / 1000;        //the time between each waiting
         response = false;        //set the responses  
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
-        Debug.Log("running a trial");
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
+        Debug.Log("Trial values:");
+        Debug.Log("Static Delay: " + iStaticDelay);
+        Debug.Log("opacity Increase: " + opacityIncrease);
+        Debug.Log("waiting Period: " + waitingPeriod);
+        Debug.Log("iMask Delay: " + iMaskDelay);
+        Debug.Log("num of Iterations: " + numOfIt);
         startTimer = true;
         Debug.Log("running a trial");
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
-            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
-            {   //each new mondrian will be found using a do while loop
-                do
-                {
-                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
-                } while (x == holder);
-                ImgArr[x].enabled = true;
-                ImgArr[holder].enabled = false;
-                holder = x;
-            }
-            //once i reaches the flash delay it will begin fading in the image
-            if (i >= iStaticDelay)
-            {
-                Debug.Log(opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage1.color = new Color(opacity, opacity, opacity, opacity);
-                changeImage2.color = new Color(opacity, opacity, opacity, opacity);
-            }
-
             if (exit)           //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)     //if the trial is a response
                 break;
 
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImage1GO, changeImage2GO, T.quadrant);
+
+            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
+            {   //each new mondrian will be found using a do while loop
+                //once i reaches the flash delay it will begin fading in the image
+                if (i >= iStaticDelay && opacity < T.opacity / 100)
+                {
+                    Debug.Log(opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage1.color = changeImage2.color = new Color(opacity, opacity, opacity, opacity);
+                }
+                do
+                {
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                } while (x == holder);
+                ImgArr[x].enabled = true;
+                ImgArr[holder].enabled = false;
+                holder = x;
+            }
             yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
             Debug.Log(i + " " + x);
         }
@@ -725,7 +836,7 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runMultiTrial(FlashMondTrial T, RawImage changeImage1, RawImage changeImage2, RawImage[] ImgArr)
+    IEnumerator runMultiTrial(FlashMondTrial T, RawImage changeImage1, RawImage changeImage2, GameObject changeImage1GO, GameObject changeImage2GO, RawImage[] ImgArr)
     {
         changeImage1.color = new Color(0f, 0f, 0f, 0f);
         changeImage2.color = new Color(0f, 0f, 0f, 0f);
@@ -734,61 +845,69 @@ public class ExperimentRunner : MonoBehaviour
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         int holder = 0, x = 0; //holds the last index in the array that is currently active
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
         response = false;        //set the responses  
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
-        Debug.Log("running a trial");
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
+        Debug.Log("Trial values:");
+        Debug.Log("Static Delay: " + iStaticDelay);
+        Debug.Log("opacity Increase: " + opacityIncrease);
+        Debug.Log("waiting Period: " + waitingPeriod);
+        Debug.Log("iMask Delay: " + iMaskDelay);
+        Debug.Log("num of Iterations: " + numOfIt);
         startTimer = true;
         Debug.Log("running a trial");
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
-            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
-            {   //each new mondrian will be found using a do while loop
-                do
-                {
-                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
-                } while (x == holder);
-                ImgArr[holder].enabled = false;
-                changeImage1.enabled = false;
-                changeImage2.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                changeImage1.enabled = true;
-                changeImage2.enabled = true;
-                ImgArr[x].enabled = true;
-                holder = x;
-            }
-            //once i reaches the flash delay it will begin fading in the image
-            if (i >= iStaticDelay)
-            {
-                Debug.Log(opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage1.color = new Color(opacity, opacity, opacity, opacity);
-                changeImage2.color = new Color(opacity, opacity, opacity, opacity);
-            }
-
             if (exit)           //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)         //if the trial is a response
                 break;
 
-            yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImage1GO, changeImage2GO, T.quadrant);
+
+            if (i >= iMaskDelay)     //once i reaches this point it will begin the mondrian flashing
+            {   //each new mondrian will be found using a do while loop
+                //once i reaches the flash delay it will begin fading in the image
+                if (i >= iStaticDelay && opacity < T.opacity / 100)
+                {
+                    Debug.Log(opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage1.color = changeImage2.color = new Color(opacity, opacity, opacity, opacity);
+                }
+                yield return new WaitForSecondsRealtime(waitingPeriod);
+                do
+                {
+                    x = UnityEngine.Random.Range(exp.Mondrians[T.mond].minRange, exp.Mondrians[T.mond].maxRange);
+                } while (x == holder);
+                ImgArr[holder].enabled = changeImage2.enabled = changeImage1.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                changeImage1.enabled = changeImage2.enabled = ImgArr[x].enabled = true;
+                holder = x;
+            }
+            else
+                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
             Debug.Log(i + " " + x);
         }
         if (T.isResponse)
@@ -814,7 +933,7 @@ public class ExperimentRunner : MonoBehaviour
         yield break;
     }
 
-    IEnumerator runMultiTrial(MaskTrial T, RawImage changeImage1, RawImage changeImage2, RawImage oppositeChangeImage, RawImage[] ImgArr)
+    IEnumerator runMultiTrial(MaskTrial T, RawImage changeImage1, RawImage changeImage2, GameObject changeImage1GO, GameObject changeImage2GO, RawImage oppositeChangeImage)
     {
         changeImage1.color = new Color(0f, 0f, 0f, 0f);
         changeImage1.enabled = true;
@@ -824,63 +943,62 @@ public class ExperimentRunner : MonoBehaviour
         //num of iterations throught the  = Duration / flash duration 
         int numOfIt = T.duration / T.flashDuration;
         //mask delay in terms of i 
-        int iMaskDelay = T.maskDelay / T.duration;
+        int iMaskDelay = T.maskDelay / T.flashDuration;
         //Flash Delay = static delay / flash duration
         int iStaticDelay = T.staticDelay / T.flashDuration;
         //opacity increase each trial = opacity / i static delay ) / 100 because the float value range for alpha is from 0 - 1
-        float opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
-        float opacity = new float();
+        float opacity = new float(), opacityIncrease = new float();
+        int iTimeToReachOpacity = T.timeToReachOpacity / T.flashDuration;
+        if (T.timeToReachOpacity > 0)
+            opacityIncrease = (float)(T.opacity / iTimeToReachOpacity) / 100;
+        else if (T.timeToReachOpacity == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
+        {
+            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);//not increase throughout
+            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
+            opacity = T.opacity;
+        }
+        else
+            opacityIncrease = (float)(T.opacity / (numOfIt - iStaticDelay)) / 100;
         float flashPeriod = T.flashPeriod / 1000;     //the time in ms that each image is on    (image off screen time)
         float waitingPeriod = ((float)T.flashDuration - T.flashPeriod) / 1000;  //the total time waiting between each trial   (image on screen time)
         response = false;        //set the responses  
         upRes = T.up; downRes = T.down; leftRes = T.left; rightRes = T.right;
         responseTiming = responseHolder = "";
-        Debug.Log("running a trial");
-
-        if (T.staticDelay == 0)                  //If the flash delay is 0 thend the opacity will be set to the set opacity at the beginning and it will 
-        {                                               //not increase throughout
-            changeImage1.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            changeImage2.color = new Color(T.opacity, T.opacity, T.opacity, T.opacity);
-            iStaticDelay = numOfIt + 1;
-        }
+        Debug.Log("Trial values:");
+        Debug.Log("Static Delay: " + iStaticDelay);
+        Debug.Log("opacity Increase: " + opacityIncrease);
+        Debug.Log("waiting Period: " + waitingPeriod);
+        Debug.Log("iMask Delay: " + iMaskDelay);
+        Debug.Log("num of Iterations: " + numOfIt);
         startTimer = true;
         Debug.Log("running a trial" + flashPeriod + " " + waitingPeriod);
         for (int i = 0; i < numOfIt; ++i)   //i will be the number if iterations and we will use i as a flag to when each different action should start
         {
-
-            if (i >= iStaticDelay) //once i reaches the flash delay it will begin fading in the image
-            {
-                Debug.Log(opacity);
-                //opacity will increase with each iteration until it reaches the specified opacity
-                opacity += opacityIncrease;
-                changeImage1.enabled = false;
-                changeImage2.enabled = false;
-                oppositeChangeImage.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                oppositeChangeImage.enabled = true;
-                changeImage1.enabled = true;
-                changeImage2.enabled = true;
-                changeImage1.color = new Color(opacity, opacity, opacity, opacity);
-                changeImage2.color = new Color(opacity, opacity, opacity, opacity);
-            }
-            else if (i >= iMaskDelay)
-            {
-                changeImage1.enabled = false;
-                changeImage2.enabled = false;
-                oppositeChangeImage.enabled = false;
-                yield return new WaitForSecondsRealtime(flashPeriod);
-                oppositeChangeImage.enabled = true;
-                changeImage1.enabled = true;
-                changeImage2.enabled = true;
-            }
-
             if (exit)               //if trial exited
                 yield break;
 
             if (response && T.isResponse && T.responseStop)     //if the trial is a response 
                 break;
 
-            yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+            if (T.quadrant == 7 || T.quadrant == 9)
+                moveToQuadrant(changeImage1GO, changeImage2GO, T.quadrant);
+
+            if (i >= iMaskDelay)
+            {
+                if (i >= iStaticDelay && opacity < T.opacity / 100) //once i reaches the flash delay it will begin fading in the image
+                {
+                    Debug.Log(opacity);
+                    //opacity will increase with each iteration until it reaches the specified opacity
+                    opacity += opacityIncrease;
+                    changeImage1.color = changeImage2.color = new Color(opacity, opacity, opacity, opacity);
+                }
+                yield return new WaitForSecondsRealtime(waitingPeriod);
+                oppositeChangeImage.enabled = changeImage1.enabled = changeImage2.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                oppositeChangeImage.enabled = changeImage2.enabled = changeImage1.enabled = true;
+            }
+            else
+                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
             Debug.Log(i);
         }
         if (T.isResponse)
