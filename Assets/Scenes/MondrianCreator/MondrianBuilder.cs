@@ -12,18 +12,27 @@ public class MondrianBuilder : MonoBehaviour
     //public Mondrian(int palette, int sh, bool pix, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
     private bool pix;
     private string mond = "";
-    private int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum;
+    private int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum, numOfMasksWritten;
     public RawImage rawImage;
+    public Image[] paletteHolders;
     public GameObject errorText;
     List<List<Color>> colors = new List<List<Color>>();
+    List<Color> newPalette = new List<Color>();
     private bool savingMond, mondDrawn;
     private string outputPath = "";
     private string folderName = "";
+    private string maskPath = "";
+    private string palettePath = "";
     public Dropdown paletteDropdown, maskDropdown, shapeDropdown;
     public InputField minH, maxH, minW, maxW, DensityIF;
+    public Canvas maskMakerCanvas, paletteCanvas; 
     List<Mondrian> MondList = new List<Mondrian>();
     List<string> colorPalettenames = new List<string>();
     public Toggle pixels;
+    public Scrollbar redSB, greenSB, blueSB;
+    private float newPaletteRed = 0, newPaletteGreen = 0, newPaletteBlue = 0;
+    public Text greenText, blueText, redText;
+    private string nameOfNewPalette = "", nameOfNewMask = ""; 
 
 
     void Start()
@@ -31,13 +40,200 @@ public class MondrianBuilder : MonoBehaviour
         setColorValues();
         palette = 0;
         sh = 0;
+        colorPalettenames.Add("Neon");
+        colorPalettenames.Add("Black & White");
+        redSB.onValueChanged.AddListener(RedOnScrollBarChange);
+        blueSB.onValueChanged.AddListener(BlueOnScrollBarChange);
+        greenSB.onValueChanged.AddListener(GreenOnScrollBarChange);
+        displayNewPalette();
     }
+
+    public void removeColor()
+    {
+        if (newPalette.Count > 0)
+        {
+            newPalette.RemoveAt(newPalette.Count - 1);
+            displayNewPalette();
+        }
+    }
+
+    public void addColorToPalette()
+    {
+        newPalette.Add(new Color(newPaletteRed, newPaletteGreen, newPaletteBlue));
+        displayNewPalette();
+    }
+
+    public void addPaletteToSet()
+    {
+        if (newPalette.Count < 1)
+        {
+            errorText.GetComponent<Text>().text = "There are no colors in this palette. ";
+            errorText.GetComponent<Text>().color = Color.red;
+        }
+        else if(colorPalettenames.Count(n => n == nameOfNewPalette) > 0)
+        {
+            errorText.GetComponent<Text>().text = "There is already a Palette with this name in the palette file.";
+            errorText.GetComponent<Text>().color = Color.red;
+        }
+        else if (nameOfNewPalette == String.Empty)
+        {
+            colors.Add(newPalette);
+            colorPalettenames.Add("New Palette " + colors.Count);
+            paletteDropdown.options.Add(new Dropdown.OptionData("New Palette " + colors.Count));
+            newPalette = new List<Color>();
+            displayNewPalette();
+            errorText.GetComponent<Text>().text = "Palette " + "New Palette " + colors.Count + " has been added.";
+            errorText.GetComponent<Text>().color = Color.white;
+        }
+        else
+        {
+            colors.Add(newPalette);
+            colorPalettenames.Add(nameOfNewPalette);
+            paletteDropdown.options.Add(new Dropdown.OptionData(nameOfNewPalette));
+            newPalette = new List<Color>();
+            displayNewPalette();
+            errorText.GetComponent<Text>().text = "Palette " + nameOfNewPalette + " has been added.";
+            errorText.GetComponent<Text>().color = Color.white;
+        }
+    }
+
+    public void clearPaletteColors()
+    {
+        for (int i = 0; i < 16; i++)
+            paletteHolders[i].color = Color.white;
+    }
+
+    private void displayNewPalette(int index = 0)
+    {
+        clearPaletteColors();
+        if (maskMakerCanvas.enabled)
+            for (int i = 0; i < 16 && i < colors[index].Count; i++)
+                paletteHolders[i].color = colors[index][i];
+        else if(paletteCanvas.enabled)
+            for (int i = 0, j = newPalette.Count - 1; i < 16 && j > -1; i++, j--)
+                paletteHolders[i].color = newPalette[j];
+    }
+
+    public void addPaletteToCSVCaller()
+    {
+        if (palettePath == String.Empty)
+        {
+            errorText.GetComponent<Text>().text = "You need to upload a Palette CSV to add this palette to";
+            errorText.GetComponent<Text>().color = Color.red;
+        }
+        else
+        {
+            addPaletteToCSV(newPalette);
+            addPaletteToSet();
+            errorText.GetComponent<Text>().text = "Palette " + nameOfNewPalette + " has been added to CSV.";
+            errorText.GetComponent<Text>().color = Color.white;
+            clearPaletteColors();
+        }
+    }
+
+    private void addPaletteToCSV(List<Color> ListToPrint)
+    {
+        if(palettePath != String.Empty)
+        {
+            try
+            {
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(palettePath, true))
+                {
+                    string itemToWrite = "";
+                    if(nameOfNewPalette == String.Empty || colorPalettenames.Count(n => n == nameOfNewPalette) > 0)
+                        itemToWrite += "New Palette " + (colors.Count + 1) + ","; 
+                    else
+                        itemToWrite += nameOfNewPalette + ",";
+
+                    foreach (Color c in ListToPrint)
+                    {
+                        // Format the RGB values as a comma-separated string (CSV format).
+                        string csvData = $"{(int)(c.r * 255f)},{(int)(c.g * 255f)},{(int)(c.b * 255f)},";
+                        // Write the data to the CSV file.
+                        itemToWrite += csvData;
+                    }
+                    writer.Write("\n" + itemToWrite);
+                }
+                Debug.Log("Colors written to CSV successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Error writing colors to CSV: " + ex.Message);
+            }
+        }
+    }
+
+    public void addMaskToCSV()
+    {
+        if (maskPath != String.Empty)
+        {
+            try
+            {
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(maskPath, true))
+                {
+                    if (nameOfNewMask == String.Empty)
+                        writer.Write("\n" + "New Mask " + numOfMasksWritten.ToString() + "," + colorPalettenames[palette] + "," + (sh + 1).ToString() + "," + Convert.ToInt32(pix) + "," + minWidth.ToString() + "," + maxWidth.ToString() + "," + minHeight.ToString() + "," + maxHeight.ToString() + "," + density.ToString());
+                    else
+                        writer.Write("\n" + nameOfNewMask + "," + colorPalettenames[palette] + "," + (sh + 1).ToString() + "," + Convert.ToInt32(pix) + "," + minWidth.ToString() + "," + maxWidth.ToString() + "," + minHeight.ToString() + "," + maxHeight.ToString() + "," + density.ToString());
+                }
+                Debug.Log("Masks written to CSV successfully.");
+                if(nameOfNewMask != String.Empty)
+                    errorText.GetComponent<Text>().text = "Mask " + nameOfNewMask + " has been added to CSV.";
+                else
+                    errorText.GetComponent<Text>().text = "New Mask " + numOfMasksWritten.ToString() + " has been added to CSV.";
+                errorText.GetComponent<Text>().color = Color.white;
+                numOfMasksWritten++;
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Error writing Masks to CSV: " + ex.Message);
+            }
+        }
+    }
+
+    private void RedOnScrollBarChange(float value)
+    {
+        newPaletteRed = value;
+        redText.text = (Math.Round(value * 255, 0)).ToString();
+    }
+
+    private void GreenOnScrollBarChange(float value)
+    {
+        newPaletteGreen = value;
+        greenText.text = (Math.Round(value * 255,0)).ToString();
+    }
+
+    private void BlueOnScrollBarChange(float value)
+    {
+        newPaletteBlue = value;
+        blueText.text = (Math.Round(value * 255, 0)).ToString();
+    }
+
+    private void Update()
+    {
+        if(paletteCanvas.enabled)
+        {
+            rawImage.color = new Color(newPaletteRed, newPaletteGreen, newPaletteBlue);
+        }
+    }
+
 
     //Most of the code in this section is for the input GUI
     //--------------------------------GUI------------------------------------------
     public void changePalette(int pal)
     {
         palette = pal;
+        displayNewPalette(palette);
+    }
+
+    public void changePaletteName(string str)
+    {
+        nameOfNewPalette = str;
+    }
+
+    public void changeNewMaskName(string str)
+    {
+        nameOfNewMask = str;
     }
 
     public void useMask(int m)
@@ -269,6 +465,22 @@ public class MondrianBuilder : MonoBehaviour
         folderName = name;
     }
 
+    public void openPaletteMaker()
+    {
+        maskMakerCanvas.enabled = false;
+        clearMondrian();            //White out the image 
+        paletteCanvas.enabled = true;
+        displayNewPalette();        //Display a new palette
+    }
+
+    public void openMaskMaker()
+    {
+        maskMakerCanvas.enabled = true;
+        paletteCanvas.enabled = false;
+        displayNewPalette(palette); //Display the new palette
+        rawImage.color = Color.white;
+    }
+
     public void changeNumberofMonds(string number)
     {
         try
@@ -346,6 +558,7 @@ public class MondrianBuilder : MonoBehaviour
             holderPath = SFB.StandaloneFileBrowser.OpenFilePanel("Open File", "", "csv", true);
             foreach (var i in holderPath)
                 path += i;
+            palettePath = path;
             uploadPalette(path);
         }
         catch (IOException)
@@ -374,6 +587,7 @@ public class MondrianBuilder : MonoBehaviour
             holderPath = SFB.StandaloneFileBrowser.OpenFilePanel("Open File", "", "csv", true);
             foreach (var i in holderPath)
                 path += i;
+            maskPath = path;
             readMondrians(path);
         }
         catch (IOException)

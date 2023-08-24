@@ -477,7 +477,7 @@ public class UIManager : MonoBehaviour
                                         break;
                                     //case 19:
                                     case 19:
-                                        TTRO = result;
+                                        TTRO = result - maskDelay;
                                         break;
                                     case 20:
                                         quadrant = result;
@@ -592,6 +592,39 @@ public class UIManager : MonoBehaviour
             uploadSuccessfull = false;
         }
     }
+
+    public void simulateTrials()
+    {
+        int conditionIndex = 0, blockIndex = 0, trialIndex = 0, counter = 0;
+        string fileName = "";
+        if (experiment.outputPath != string.Empty)
+            fileName = experiment.outputPath + "/" + experiment.ID + ".csv";
+        else
+            fileName = experiment.csvOriginDirectory + "/" + experiment.ID + ".csv";
+
+        using (StreamWriter writer = File.AppendText(fileName))
+        {
+            writer.Write("ERROR,Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mask,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
+            for (int i = 0; i < experiment.numberOfConditions; ++i)
+            {
+                conditionIndex = experiment.index[i];
+                for (int j = 0; j < experiment.conditions[conditionIndex].numberOfBlocks; ++j)
+                {
+                    blockIndex = experiment.conditions[conditionIndex].index[j];
+                    for (int k = 0; k < experiment.conditions[conditionIndex].blocks[blockIndex].numberOfTrials; ++k, ++counter)
+                    {
+                        trialIndex = experiment.conditions[conditionIndex].blocks[blockIndex].index[k];
+                        experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].simCheck();
+                        writer.Write(experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].error + "," +
+                            experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].printTrial(conditionIndex, experiment.conditions[conditionIndex].random, blockIndex, experiment.conditions[conditionIndex].blocks[blockIndex].random, trialIndex, counter) );
+                    }
+                }
+            }
+            writer.Close();
+        }
+    }
+
+
 
     //---------------------------------------------------Mondrian upload caller----------------------------------------------------------------
     public void uploadMondrians()
