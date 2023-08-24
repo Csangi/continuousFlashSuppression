@@ -8,9 +8,10 @@ public abstract class Item
     public string imagePath { get; set; }                               //file path to image
     public string image2 { get; set; }
     public string image2Path { get; set; }
-
+    public string error { get; set; }
     public Item(int rand, int blk, string img, bool multi, string img2)
     {
+        error = "";
         random = rand;
         block = blk;
         image = img;
@@ -19,7 +20,9 @@ public abstract class Item
         image2 = img2;
         image2Path = "";
     }
-    public abstract void printTrial();
+    public abstract void printTrialToConsole();
+    public abstract void simCheck();
+    public abstract string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter);
 }
 
 //---------------Trial using modrians--------------------------------------
@@ -62,7 +65,48 @@ public class MondTrial : Item
         quadrant = quad;
     }
 
-    public override void printTrial()
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        if (hasMultipleStims)
+        {
+            writer += "MultiMondrianTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + "_" + image2 + ",";
+        }
+        else
+        {
+            writer += "MondrianTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + ",";
+        }
+        writer += duration + ",";
+        writer += flashDuration + ",";
+        writer += opacity + ",";
+        writer += maskDelay + ",";
+        writer += staticDelay + ",";
+        writer += mond + ",";
+        if (isResponse)
+        {
+            writer += responseTime + ",";
+            writer += up + ",";
+            writer += down + ",";
+            writer += left + ",";
+            writer += right + ",";
+            writer += response + ",,";
+            writer += (!responseStop) + ",";
+        }
+        writer += "\n";
+        return writer; 
+    }
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of mond trial print-----------------------");
         Debug.Log("Type = Trial\n");
@@ -88,6 +132,21 @@ public class MondTrial : Item
             Debug.Log("Down = " + down + "\n");
         }
         Debug.Log("---------------------end of trial print-------------------------");
+    }
+    public override void simCheck()
+    {
+        if (duration % flashDuration != 0)
+            error += "Duration must be divisible by flash duration.";
+        if (maskDelay % flashDuration != 0)
+            error += "Mask delay must be divisible by flash duration.";
+        if (staticDelay % flashDuration != 0)
+            error += "Static delay must be divisible by flash duration.";
+        if (maskDelay > duration)
+            error += "Mask delay must be less than the duration.";
+        if (staticDelay > duration)
+            error += "Static delay must be less than duration.";
+        if (staticDelay < maskDelay)
+            error += "Mask delay must be less than the static delay.";
     }
 }
 
@@ -132,8 +191,51 @@ public class FlashMondTrial : Item
         timeToReachOpacity = TTRO;
         quadrant = quad;
     }
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        if (hasMultipleStims)
+        {
+            writer += "MultiMondrianTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + "_" + image2 + ",";
+        }
+        else
+        {
+            writer += "MondrianTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + ",";
+        }
+        writer += duration + ",";
+        writer += flashDuration + ",";
+        writer += opacity + ",";
+        writer += maskDelay + ",";
+        writer += staticDelay + ",";
+        writer += mond + ",";
+        if (isResponse)
+        {
+            writer += responseTime + ",";
+            writer += up + ",";
+            writer += down + ",";
+            writer += left + ",";
+            writer += right + ",";
+            writer += response + ",";
+        }
+        else
+            writer += ",,,,,,";
+        writer += flashPeriod + ",";
+        writer += (!responseStop) + "\n";
+        return writer; 
+    }
     //debug print statement for error checking
-    public override void printTrial()
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of flash mond trial print-----------------------");
         Debug.Log("Type = Trial\n");
@@ -160,6 +262,23 @@ public class FlashMondTrial : Item
             Debug.Log("Down = " + down + "\n");
         }
         Debug.Log("---------------------end of trial print-------------------------");
+    }
+    public override void simCheck()
+    {
+        if (duration % flashDuration != 0)
+            error += "Duration must be divisible by flash duration.";
+        if (maskDelay % flashDuration != 0)
+            error += "Mask delay must be divisible by flash duration.";
+        if (staticDelay % flashDuration != 0)
+            error += "Static delay must be divisible by flash duration.";
+        if (maskDelay > duration)
+            error += "Mask delay must be less than the duration.";
+        if (staticDelay > duration)
+            error += "Static delay must be less than duration.";
+        if (staticDelay < maskDelay)
+            error += "Mask delay must be less than the static delay.";
+        if (flashPeriod > flashDuration)
+            error += "Blank period must be less than flash duration.";
     }
 }
 
@@ -206,8 +325,50 @@ public class MaskTrial : Item
         timeToReachOpacity = TTRO;
         quadrant = quad;
     }
-
-    public override void printTrial()
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        if (hasMultipleStims)
+        {
+            writer += "MultiMaskTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + "&" + image2 + ",";
+        }
+        else
+        {
+            writer += "MaskTrial,";
+            writer += ++trial + ",";
+            writer += random + ",";
+            writer += image + ",";
+        }
+        writer += duration + ",";
+        writer += flashDuration + ",";
+        writer += opacity + ",";
+        writer += maskDelay + ",";
+        writer += staticDelay + ",";
+        writer += mask + ",";
+        if (isResponse)
+        {
+            writer += responseTime + ",";
+            writer += up + ",";
+            writer += down + ",";
+            writer += left + ",";
+            writer += right + ",";
+            writer += response + ",";
+        }
+        else
+            writer += ",,,,,,";
+        writer += flashPeriod + ",";
+        writer += (!responseStop) + "\n";
+        return writer; 
+    }
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of mask trial print-----------------------");
         Debug.Log("Type = Trial\n");
@@ -235,6 +396,23 @@ public class MaskTrial : Item
         }
         Debug.Log("---------------------end of trial print-------------------------");
     }
+    public override void simCheck()
+    {
+        if (duration % flashDuration != 0)
+            error += "Duration must be divisible by flash duration.";
+        if (maskDelay % flashDuration != 0)
+            error += "Mask delay must be divisible by flash duration.";
+        if (staticDelay % flashDuration != 0)
+            error += "Static delay must be divisible by flash duration.";
+        if (maskDelay > duration)
+            error += "Mask delay must be less than the duration.";
+        if (staticDelay > duration)
+            error += "Static delay must be less than duration.";
+        if (staticDelay < maskDelay)
+            error += "Mask delay must be less than the static delay.";
+        if (flashPeriod > flashDuration)
+            error += "Blank period must be less than flash duration.";
+    }
 }
 
 //--------------------------------instruction-----------------------------------------
@@ -247,8 +425,23 @@ public class Instruction : Item
         duration = dur;
         responseTime = 0;
     }
-
-    public override void printTrial()
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        writer += "Instruction,";
+        writer += ++trial + ",";
+        writer += random + ",";
+        writer += image + ",";
+        writer += duration + ",,,,,,";
+        writer += responseTime + ",\n";
+        return writer; 
+    }
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of trial print-----------------------");
         Debug.Log("Type = Instruction\n");
@@ -257,6 +450,11 @@ public class Instruction : Item
         Debug.Log("duration = " + duration + "\t");
         Debug.Log("image = " + image + "\t");
         Debug.Log("---------------------end of trial print-------------------------");
+    }
+    public override void simCheck()
+    {
+        if (duration < 0)
+            error += "duration must be greater than zero";
     }
 }
 
@@ -274,7 +472,27 @@ public class Response : Item
         response = "";
         responseTime = 0;
     }
-    public override void printTrial()
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        writer += "Response,";
+        writer += ++trial + ",";
+        writer += random + ",";
+        writer += image + ",,,,,,,";
+        writer += responseTime + ",";
+        writer += up + ",";
+        writer += down + ",";
+        writer += left + ",";
+        writer += right + ",";
+        writer += response + ",\n";
+        return writer;
+    }
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of trial print-----------------------");
         Debug.Log("Type = Response\n");
@@ -287,6 +505,10 @@ public class Response : Item
         Debug.Log("right = " + right + "\t");
         Debug.Log("---------------------end of trial print-------------------------");
     }
+    public override void simCheck()
+    {
+
+    }
 }
 
 //---------------------------------------------Break trial--------------------------------------------
@@ -297,8 +519,22 @@ public class Break : Item
     {
         duration = dur;
     }
-
-    public override void printTrial()
+    public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
+    {
+        string writer = "";
+        writer += ++counter + ",";
+        writer += ++cond + ",";
+        writer += condRand + ",";
+        writer += ++blk + ",";
+        writer += blkRand + ",";
+        writer += "Break,";
+        writer += ++trial + ",";
+        writer += random + ",";
+        writer += image + ",";
+        writer += duration + ",\n";
+        return writer; 
+    }
+    public override void printTrialToConsole()
     {
         Debug.Log("---------------------start of trial print-----------------------");
         Debug.Log("Type = Break\n");
@@ -307,5 +543,10 @@ public class Break : Item
         Debug.Log("duration = " + duration + "\t");
         Debug.Log("image = " + image + "\t");
         Debug.Log("---------------------end of trial print-------------------------");
+    }
+    public override void simCheck()
+    {
+        if (duration < 0)
+            error += "Duration must be greater than zero.";
     }
 }

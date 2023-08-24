@@ -275,10 +275,12 @@ public class createMond : MonoBehaviour
     public static Texture2D DrawPixelated(Texture2D tex, List<Color> color, Mondrian mond)
     {
         Color c;
-        int colorNumber = 0;
+        //int colorNumber = 0;
         for (int i = 0; i <= 225; ++i)
             for (int j = 0; j <= 255; ++j)
             {
+                c = color[Random.Range(0,color.Count)];
+                /*
                 if (color.Count > 1)
                 {
                     colorNumber++;
@@ -289,6 +291,7 @@ public class createMond : MonoBehaviour
                 }
                 else
                     c = color.First();
+                */
                 tex.SetPixel(i, j, c);
             }
         tex.Apply();

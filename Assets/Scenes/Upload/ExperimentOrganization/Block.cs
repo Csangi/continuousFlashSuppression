@@ -53,7 +53,7 @@ public class Block
         for (int i = 0; i < numberOfTrials; i++)
         {
             Debug.Log("Trial number " + i);
-            this.trials[this.index[i]].printTrial();
+            this.trials[this.index[i]].printTrialToConsole();
         }
         Debug.Log("-----------------------------------------------------------------end of block");
     }
