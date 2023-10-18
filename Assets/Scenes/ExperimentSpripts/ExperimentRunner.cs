@@ -406,13 +406,29 @@ public class ExperimentRunner : MonoBehaviour
                 changeimage2.transform.localPosition = new Vector3(25f, -25f, 0);
                 break;
             case 8:
-            case 9:
-                float x = UnityEngine.Random.Range(-25, 25);
-                float y = UnityEngine.Random.Range(-25, 25);
-                changeimage1.transform.localPosition = new Vector3(x, y, 0);
-                x = UnityEngine.Random.Range(-25, 25);
-                y = UnityEngine.Random.Range(-25, 25);
-                changeimage2.transform.localPosition = new Vector3(x, y, 0);
+            case 9:     //in this algorithm we want to set the position of both images randomly such that they do not overlap with each other
+                        //we can achieve this by making sure that the x and y of each image are not equal and that the 
+                float x = 0, y = 0, x2 = 0, y2 = 0 ;
+                do
+                {
+                    do
+                    {
+                        x = UnityEngine.Random.Range(-1, 2);
+                        y = UnityEngine.Random.Range(-1, 2);
+                    } while (x == 0 && y == 0);
+                    do
+                    {
+                        do
+                            x2 = UnityEngine.Random.Range(-1, 2);
+                        while (x2 == x);
+                        do
+                            y2 = UnityEngine.Random.Range(-1, 2);
+                        while (y2 == y);
+                    } while (x2 == 0 && y2 == 0);
+                } while ((x == 1 && y == 0 && x2 == 0 && y2 == -1) || (x == -1 && y == 0 && x2 == 0 && y2 == 1) || (x == -1 && y == 0 && x2 == 0 && y2 == -1) || (x == 1 && y == 0 && x2 == 0 && y2 == 1) ||
+                        (x2 == 1 && y2 == 0 && x == 0 && y == -1) || (x2 == -1 && y2 == 0 && x == 0 && y == 1) || (x2 == -1 && y2 == 0 && x == 0 && y == -1) || (x2 == 1 && y2 == 0 && x == 0 && y == 1));
+                changeimage1.transform.localPosition = new Vector3(x * 25f, y * 25f, 0);
+                changeimage2.transform.localPosition = new Vector3(x2 * 25f, y2 * 25f, 0);
                 break;
         }
     }
@@ -631,7 +647,12 @@ public class ExperimentRunner : MonoBehaviour
                 holder = x;
             }
             else
-                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
+            {
+                yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+                changeImage.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                changeImage.enabled = true;
+            }
             Debug.Log(i + " " + x);
         }
         if (T.isResponse)
@@ -719,7 +740,12 @@ public class ExperimentRunner : MonoBehaviour
                 oppositeChangeImage.enabled = changeImage.enabled = true;
             }
             else
-                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
+            {
+                yield return new WaitForSecondsRealtime(waitingPeriod);     //we will wait for the specified waiting period
+                changeImage.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                changeImage.enabled = true;
+            }
             Debug.Log(i);
         }
         if (T.isResponse)
@@ -998,7 +1024,12 @@ public class ExperimentRunner : MonoBehaviour
                 oppositeChangeImage.enabled = changeImage2.enabled = changeImage1.enabled = true;
             }
             else
-                yield return new WaitForSecondsRealtime(waitingPeriod + flashPeriod);     //we will wait for the specified waiting period
+            {
+                yield return new WaitForSecondsRealtime(waitingPeriod);
+                oppositeChangeImage.enabled = false;
+                yield return new WaitForSecondsRealtime(flashPeriod);
+                oppositeChangeImage.enabled = true;  //we will wait for the specified waiting period
+            }
             Debug.Log(i);
         }
         if (T.isResponse)

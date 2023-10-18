@@ -97,7 +97,7 @@ public class createMond : MonoBehaviour
         }
         else if (exp.Mondrians[whichmond].shape == Shape.pixelated)
         {
-            leftImg.texture = DrawPixelated(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
+            leftImg.texture = CreatePixelated(rightImg.texture as Texture2D, colors[exp.Mondrians[whichmond].palette], exp.Mondrians[whichmond]);
             (leftImg.texture as Texture2D).Apply();
         }
         else if (exp.Mondrians[whichmond].shape == Shape.circle)
@@ -212,11 +212,12 @@ public class createMond : MonoBehaviour
 
     public static Texture2D DrawTriangle(Texture2D tex, List<Color> color, Mondrian mond)
     {
-        if (mond.addPixelated)
-            DrawPixelated(tex, color, mond);
-        int x, y, tbase, height, colorNumber = 0;
-        Color c;
-        for (int i = 0; i < mond.density; ++i)
+        int colorNumber = 0;
+        Color c = new Color();
+        int texWidth = tex.width;
+        int texHeight = tex.height;
+
+        for (int i = 0; i < mond.density; i++)
         {
             if (color.Count > 1)
             {
@@ -228,16 +229,51 @@ public class createMond : MonoBehaviour
             }
             else
                 c = color.First();
-            x = Random.Range(0, 225);
-            tbase = Random.Range(mond.minWidth, mond.maxWidth);
-            y = Random.Range(0, 225);
-            height = Random.Range(mond.minHeight, mond.maxHeight);
-            for (int u = x - tbase; u < x + tbase + 1; u++)
-                for (int v = y - height; v < y + height + 1; v++)
-                    if (1 / 2 * tbase * height < 1)
-                        tex.SetPixel(u, v, c);
-            tex.Apply();
+            // Randomly determine the vertices and sizes of the triangle
+            Vector2 vertex1 = new Vector2(Random.Range(0, texWidth), Random.Range(0, texHeight));
+            Vector2 vertex2 = new Vector2(Random.Range(vertex1.x + mond.minWidth, vertex1.x + mond.maxWidth), Random.Range(vertex1.y + mond.minHeight, vertex1.y + mond.maxHeight));
+            Vector2 vertex3 = new Vector2(Random.Range(vertex1.x + mond.minWidth, vertex1.x + mond.maxWidth), Random.Range(vertex1.y + mond.minHeight, vertex1.y + mond.maxHeight));
+
+            // Random width and height for the triangle
+            float width = Random.Range(mond.minWidth, mond.maxWidth); // Adjust the range as needed
+            float height = Random.Range(mond.minHeight, mond.maxHeight); // Adjust the range as needed
+
+            // Modify vertices based on width and height
+            
+            vertex2.x = vertex1.x + width;
+            vertex3.x = vertex1.x + (width / 2);
+            vertex3.y = vertex1.y - height;
+            Debug.Log(vertex1);
+            Debug.Log(vertex2);
+            Debug.Log(vertex3);
+
+            // Sort vertices by y-coordinate
+            Vector2[] vertices = { vertex1, vertex2, vertex3 };
+            System.Array.Sort(vertices, (a, b) => a.y.CompareTo(b.y));
+            
+
+            float dx1 = (vertices[1].x - vertices[0].x) / (vertices[1].y - vertices[0].y);
+            float dx2 = (vertices[2].x - vertices[0].x) / (vertices[2].y - vertices[0].y);
+
+            float x1 = vertices[0].x;
+            float x2 = vertices[0].x;
+            Debug.Log(dx1);
+            Debug.Log(dx2);
+
+            // Scanline filling
+            for (int y = (int)vertices[0].y; y <= vertices[2].y; y++)
+            {
+                for (int x = Mathf.FloorToInt(x1); x <= Mathf.CeilToInt(x2); x++)
+                {
+                    if (x >= 0 && x < texWidth && y >= 0 && y < texHeight)
+                        tex.SetPixel(x, y, c);
+                }
+                x1 += dx1;
+                x2 += dx2;
+            }
         }
+
+        tex.Apply();
         return tex;
     }
 
@@ -298,6 +334,30 @@ public class createMond : MonoBehaviour
         return tex;
     }
 
+    public static Texture2D CreatePixelated(Texture2D tex, List<Color> color, Mondrian mond)
+    {
+        Color c;
+        int colorNumber = 0;
+        for (int i = 0; i <= 225; ++i)
+            for (int j = 0; j <= 255; ++j)
+            {
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
+                
+                tex.SetPixel(i, j, c);
+            }
+        tex.Apply();
+        return tex;
+    }
+
     public static Texture2D DrawMixed(Texture2D tex, List<Color> color, Mondrian mond)
     {
         if (mond.addPixelated)
@@ -306,7 +366,7 @@ public class createMond : MonoBehaviour
         Color c;
         for (int i = 0; i < mond.density; ++i)
         {
-            if (i % 4 == 0) //ellipse
+            if (i % 5 == 0) //ellipse
             {
                 if (color.Count > 1)
                 {
@@ -328,7 +388,7 @@ public class createMond : MonoBehaviour
                             tex.SetPixel(u, v, c);
                 tex.Apply();
             }
-            else if (i % 4 == 1)   //rectangle
+            else if (i % 5 == 1)   //rectangle
             {
                 if (color.Count > 1)
                 {
@@ -349,7 +409,7 @@ public class createMond : MonoBehaviour
                         tex.SetPixel(u, v, c);
                 tex.Apply();
             }
-            else if (i % 4 == 2)     //circle
+            else if (i % 5 == 2)     //circle
             {
                 if (color.Count > 1)
                 {
@@ -371,7 +431,7 @@ public class createMond : MonoBehaviour
                             tex.SetPixel(u, v, c);
                 tex.Apply();
             }
-            else if (i % 4 == 3)     //square
+            else if (i % 5 == 3)     //square
             {
                 if (color.Count > 1)
                 {
@@ -389,6 +449,62 @@ public class createMond : MonoBehaviour
                 for (int u = x - size; u < x + size + 1; u++)
                     for (int v = y - size; v < y + size + 1; v++)
                         tex.SetPixel(u, v, c);
+                tex.Apply();
+            }
+            else if(i % 5 == 4)
+            {
+                if (color.Count > 1)
+                {
+                    colorNumber++;
+                    if (!(colorNumber < color.Count))
+                        colorNumber = 0;
+
+                    c = color[colorNumber];
+                }
+                else
+                    c = color.First();
+                // Randomly determine the vertices and sizes of the triangle
+                Vector2 vertex1 = new Vector2(Random.Range(0, tex.width), Random.Range(0, tex.height));
+                Vector2 vertex2 = new Vector2(Random.Range(vertex1.x + mond.minWidth, vertex1.x + mond.maxWidth), Random.Range(vertex1.y + mond.minHeight, vertex1.y + mond.maxHeight));
+                Vector2 vertex3 = new Vector2(Random.Range(vertex1.x + mond.minWidth, vertex1.x + mond.maxWidth), Random.Range(vertex1.y + mond.minHeight, vertex1.y + mond.maxHeight));
+
+                // Random width and height for the triangle
+                width = Random.Range(mond.minWidth, mond.maxWidth); // Adjust the range as needed
+                height = Random.Range(mond.minHeight, mond.maxHeight); // Adjust the range as needed
+
+                // Modify vertices based on width and height
+
+                vertex2.x = vertex1.x + width;
+                vertex3.x = vertex1.x + (width / 2);
+                vertex3.y = vertex1.y - height;
+                Debug.Log(vertex1);
+                Debug.Log(vertex2);
+                Debug.Log(vertex3);
+
+                // Sort vertices by y-coordinate
+                Vector2[] vertices = { vertex1, vertex2, vertex3 };
+                System.Array.Sort(vertices, (a, b) => a.y.CompareTo(b.y));
+
+
+                float dx1 = (vertices[1].x - vertices[0].x) / (vertices[1].y - vertices[0].y);
+                float dx2 = (vertices[2].x - vertices[0].x) / (vertices[2].y - vertices[0].y);
+
+                float x1 = vertices[0].x;
+                float x2 = vertices[0].x;
+                Debug.Log(dx1);
+                Debug.Log(dx2);
+
+                // Scanline filling
+                for (int h = (int)vertices[0].y; h <= vertices[2].y; h++)
+                {
+                    for (int j = Mathf.FloorToInt(x1); j <= Mathf.CeilToInt(x2); j++)
+                    {
+                        if (j >= 0 && j < tex.width && h >= 0 && h < tex.height)
+                            tex.SetPixel(j, h, c);
+                    }
+                    x1 += dx1;
+                    x2 += dx2;
+                }
                 tex.Apply();
             }
         }

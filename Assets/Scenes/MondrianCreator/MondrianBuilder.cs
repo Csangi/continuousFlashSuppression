@@ -10,29 +10,31 @@ using UnityEngine.UI;
 public class MondrianBuilder : MonoBehaviour
 {
     //public Mondrian(int palette, int sh, bool pix, int minWidth, int maxWidth, int minHeight, int maxHeight, int density)
-    private bool pix;
-    private string mond = "";
-    private int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum, numOfMasksWritten;
-    public RawImage rawImage;
-    public Image[] paletteHolders;
-    public GameObject errorText;
-    List<List<Color>> colors = new List<List<Color>>();
-    List<Color> newPalette = new List<Color>();
-    private bool savingMond, mondDrawn;
-    private string outputPath = "";
-    private string folderName = "";
-    private string maskPath = "";
-    private string palettePath = "";
-    public Dropdown paletteDropdown, maskDropdown, shapeDropdown;
-    public InputField minH, maxH, minW, maxW, DensityIF;
-    public Canvas maskMakerCanvas, paletteCanvas; 
-    List<Mondrian> MondList = new List<Mondrian>();
-    List<string> colorPalettenames = new List<string>();
-    public Toggle pixels;
-    public Scrollbar redSB, greenSB, blueSB;
-    private float newPaletteRed = 0, newPaletteGreen = 0, newPaletteBlue = 0;
-    public Text greenText, blueText, redText;
-    private string nameOfNewPalette = "", nameOfNewMask = ""; 
+    private bool pix;       //if the mondrian should be pixelated
+    private string mond = "";   //the name of the mond when it is saved to the csv
+    private int palette, sh, minWidth, maxWidth, minHeight, maxHeight, density, num, mondNum, numOfMasksWritten;    //holder values for all the input fields
+    public RawImage rawImage;   //the main image in the mask maker
+    public Image[] paletteHolders;  //all the images around the mondrain
+    public GameObject errorText;    //the error text in the bottom left of the screen
+    List<List<Color>> colors = new List<List<Color>>();     //2d list of palettes
+    List<Color> newPalette = new List<Color>(); //new palette used for the palette maker
+    private bool savingMond, mondDrawn;         //for when the mond is drawn and we are currently trying to save it to an output folder
+    private string outputPath = "";             //string output path
+    private string folderName = "";             //name of the folder the masks will be output to
+    private string maskPath = "";               //where the mond csv is uploaded from
+    private string palettePath = "";            //where the palette csv is uploaded from
+    public Dropdown paletteDropdown, maskDropdown, shapeDropdown, paletteDropdown2;   //all the dropdowns from the mask maker
+    public InputField minH, maxH, minW, maxW, DensityIF;    //input fields from the mask maker identified with IF
+    public Canvas maskMakerCanvas, paletteCanvas;   //both canvases
+    public Transform maskBuildTransform, paletteBuildTransform, saveMaskTransform, savePaletteTransform;    //the game objects for the animations when switching between mask maker and palette maker
+    List<Mondrian> MondList = new List<Mondrian>();     //the list of all the mondrians used for saving them to a csv
+    List<string> colorPalettenames = new List<string>();    //the names of the color palettes as they are usually stored in a dictionary
+    public Toggle pixels;       //the switch for if the image should be pixelated or not
+    public Scrollbar redSB, greenSB, blueSB;    //the scrollbar game objects for the palette maker
+    private float newPaletteRed = 0, newPaletteGreen = 0, newPaletteBlue = 0;       //the float holders for the palette maker
+    public Text greenText, blueText, redText;       //the text for the scroll bars in the palette makers
+    private string nameOfNewPalette = "", nameOfNewMask = "";   //naming for both the palette and the mask makers
+    public List<Button> paletteHolderButtons = new List<Button>();      //the buttons that allow the user to edit their palettes in the palette maker
 
 
     void Start()
@@ -80,6 +82,7 @@ public class MondrianBuilder : MonoBehaviour
             colors.Add(newPalette);
             colorPalettenames.Add("New Palette " + colors.Count);
             paletteDropdown.options.Add(new Dropdown.OptionData("New Palette " + colors.Count));
+            paletteDropdown2.options.Add(new Dropdown.OptionData("New Palette " + colors.Count));
             newPalette = new List<Color>();
             displayNewPalette();
             errorText.GetComponent<Text>().text = "Palette " + "New Palette " + colors.Count + " has been added.";
@@ -90,6 +93,7 @@ public class MondrianBuilder : MonoBehaviour
             colors.Add(newPalette);
             colorPalettenames.Add(nameOfNewPalette);
             paletteDropdown.options.Add(new Dropdown.OptionData(nameOfNewPalette));
+            paletteDropdown2.options.Add(new Dropdown.OptionData(nameOfNewPalette));
             newPalette = new List<Color>();
             displayNewPalette();
             errorText.GetComponent<Text>().text = "Palette " + nameOfNewPalette + " has been added.";
@@ -112,6 +116,11 @@ public class MondrianBuilder : MonoBehaviour
         else if(paletteCanvas.enabled)
             for (int i = 0, j = newPalette.Count - 1; i < 16 && j > -1; i++, j--)
                 paletteHolders[i].color = newPalette[j];
+
+        for(int i = 0; i < 16; i++)
+        {
+            paletteHolderButtons[i].image.color = paletteHolders[i].color;
+        }
     }
 
     public void addPaletteToCSVCaller()
@@ -189,6 +198,11 @@ public class MondrianBuilder : MonoBehaviour
                 Debug.Log("Error writing Masks to CSV: " + ex.Message);
             }
         }
+        else
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "You need to upload a Mask CSV to add this Mask to";
+        }
     }
 
     private void RedOnScrollBarChange(float value)
@@ -223,6 +237,9 @@ public class MondrianBuilder : MonoBehaviour
     public void changePalette(int pal)
     {
         palette = pal;
+        newPalette.Clear();
+        foreach(Color c in colors[pal])
+            newPalette.Add(c);
         displayNewPalette(palette);
     }
 
@@ -429,7 +446,7 @@ public class MondrianBuilder : MonoBehaviour
         }
         else if (m.shape == Shape.pixelated)
         {
-            rawImage.texture = createMond.DrawPixelated(rawImage.texture as Texture2D, colors[palette], m);
+            rawImage.texture = createMond.CreatePixelated(rawImage.texture as Texture2D, colors[palette], m);
             Debug.Log("Pixelated");
         }
         else if (m.shape == Shape.circle)
@@ -467,19 +484,76 @@ public class MondrianBuilder : MonoBehaviour
 
     public void openPaletteMaker()
     {
+        StartCoroutine(OpenPaletteAnimations());
+    }
+
+    private IEnumerator OpenPaletteAnimations()
+    {
+        //animations for the canvas
+        maskBuildTransform.LeanMoveLocalX(-1600, .5f).setEaseOutExpo();
+        saveMaskTransform.LeanMoveLocalX(1700, .5f).setEaseOutExpo();
+        yield return new WaitForSecondsRealtime(.5f);
         maskMakerCanvas.enabled = false;
-        clearMondrian();            //White out the image 
+        clearMondrian();            //White out the image
+        //more animations for the canvas
+        paletteBuildTransform.localPosition = new Vector2(-Screen.width,0);
+        savePaletteTransform.localPosition = new Vector2(Screen.width,-300);
         paletteCanvas.enabled = true;
+        paletteBuildTransform.LeanMoveLocalX(0, .5f).setEaseInExpo();
+        savePaletteTransform.LeanMoveLocalX(510, .5f).setEaseInExpo();
         displayNewPalette();        //Display a new palette
+        setButtons(true);
     }
 
     public void openMaskMaker()
     {
-        maskMakerCanvas.enabled = true;
-        paletteCanvas.enabled = false;
-        displayNewPalette(palette); //Display the new palette
-        rawImage.color = Color.white;
+        StartCoroutine(OpenMaskMakerAnimations());
     }
+
+    private IEnumerator OpenMaskMakerAnimations()
+    {
+        //animations for the canvas
+        paletteBuildTransform.LeanMoveLocalX(-Screen.width, .5f).setEaseOutExpo();
+        savePaletteTransform.LeanMoveLocalX(2 * Screen.width, .5f).setEaseOutExpo();
+        yield return new WaitForSecondsRealtime(.5f);
+        paletteCanvas.enabled = false;
+        rawImage.color = Color.white;
+        maskMakerCanvas.enabled = true;
+        //more animations for the canvas
+        maskBuildTransform.localPosition = new Vector2(-1600,-570);
+        saveMaskTransform.localPosition = new Vector2(1700, -870);
+        maskBuildTransform.LeanMoveLocalX(-410, .5f).setEaseInExpo();
+        saveMaskTransform.LeanMoveLocalX(510, .5f).setEaseInExpo();
+        displayNewPalette(palette); //Display the new palette
+        setButtons(false);
+    }
+
+    private void setButtons(bool boolean)
+    {
+        foreach (Button but in paletteHolderButtons)
+            but.enabled = boolean;
+    }
+
+    public void paletteHolderButtonPress(int holderNumber)
+    {
+        holderNumber = newPalette.Count - holderNumber - 1; 
+        if (!(holderNumber >= newPalette.Count) && newPalette.Count != 0 && holderNumber >= 0 )
+        {
+            Color holder = newPalette[holderNumber];
+            newPalette.RemoveAt(holderNumber);
+            greenSB.value = holder.g;
+            blueSB.value = holder.b;
+            redSB.value = holder.r;
+            errorText.GetComponent<Text>().color = Color.white;
+            errorText.GetComponent<Text>().text = "";
+            displayNewPalette();
+        }
+        else
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Please select a color that has a value";
+        }
+    }    
 
     public void changeNumberofMonds(string number)
     {
@@ -506,7 +580,7 @@ public class MondrianBuilder : MonoBehaviour
         else
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "No Mondrian was drawn. (Make sure to upload a folder)";
+            errorText.GetComponent<Text>().text = "No Mask was drawn. (Make sure to upload a folder)";
         }
     }
 
@@ -614,7 +688,7 @@ public class MondrianBuilder : MonoBehaviour
         int counter = 0, shape = 0, minW = 0, maxW = 0, minH = 0, maxH = 0, Density = 0;
         string key = "", palette = "0";
         bool pix = false;
-        if (mondPath.Length != 0)
+        if (mondPath.Length != 0 && File.Exists(mondPath))
         {
             using (var sr = new StreamReader(mondPath))
             {
@@ -678,6 +752,13 @@ public class MondrianBuilder : MonoBehaviour
             }
             MondList.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
             maskDropdown.options.Add(new Dropdown.OptionData(key));
+            errorText.GetComponent<Text>().color = Color.white;
+            errorText.GetComponent<Text>().text = "Mond file uploaded";
+        }
+        else
+        {
+            errorText.GetComponent<Text>().color = Color.red;
+            errorText.GetComponent<Text>().text = "Could not find Mond file. ";
         }
     }
 
@@ -712,14 +793,19 @@ public class MondrianBuilder : MonoBehaviour
 
     private void uploadPalette(string palettePath)
     {
+        /*
         colors.Clear();
         setColorValues();
         paletteDropdown.options.Clear();
+        paletteDropdown2.options.Clear();
         colorPalettenames.Clear();
         paletteDropdown.options.Add(new Dropdown.OptionData("Neon"));
         paletteDropdown.options.Add(new Dropdown.OptionData("Black & White"));
+        paletteDropdown2.options.Add(new Dropdown.OptionData("Neon"));
+        paletteDropdown2.options.Add(new Dropdown.OptionData("Black & White"));
         colorPalettenames.Add("Neon");
         colorPalettenames.Add("Black & White");
+        */
         int counter = 0, red = -1, green = -1, blue = -1;
         string name = "";
         List<Color> row = new List<Color>();
@@ -780,6 +866,7 @@ public class MondrianBuilder : MonoBehaviour
                         colors.Add(row);
                         row = new List<Color>();
                         paletteDropdown.options.Add(new Dropdown.OptionData(name));
+                        paletteDropdown2.options.Add(new Dropdown.OptionData(name));
                         colorPalettenames.Add(name);
                     }               //add the drop down option
                     counter++;
@@ -798,7 +885,7 @@ public class MondrianBuilder : MonoBehaviour
                 }
             }
             errorText.GetComponent<Text>().color = Color.white;
-            errorText.GetComponent<Text>().text = "";
+            errorText.GetComponent<Text>().text = "Palette file uploaded";
         }
         else
         {

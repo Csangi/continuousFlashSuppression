@@ -438,7 +438,7 @@ public class UIManager : MonoBehaviour
                                         if ((v == 3 || v == 5))
                                         {
                                             if (String.IsNullOrEmpty(mondPath) && !String.IsNullOrEmpty(values[i]))     //code has been changed so that the name of the mond file is 
-                                            {   //hard coded as mond.csv from the same directory as the upload csv
+                                            {   //hard coded as mask.csv (used to be mond.csv) from the same directory as the upload csv
                                                 mond = values[i];              //take the input 
                                                 uploadMondrians();                          //upload the mondrians to the mond array in the experiment holder
                                                 experiment.Mondrians[mond].isUsed = true;   //have to upload here because we need to know which mondrians we will use and 
@@ -563,7 +563,7 @@ public class UIManager : MonoBehaviour
             {
                 uploadSuccessfull = false;
                 uploadErrorText.GetComponent<Text>().color = Color.red;
-                uploadErrorText.GetComponent<Text>().text = "Too many Mondrians used.";
+                uploadErrorText.GetComponent<Text>().text = "Too many Noise Masks used.";
             }
 
             experiment.hasUploaded = true;          //set this to true so if there is an error and the file needs to be reuploaded the program will know to clear it beforehand
@@ -635,14 +635,14 @@ public class UIManager : MonoBehaviour
             imagePath = imagePath.Remove(imagePath.Length - 1, 1);
         }
         Debug.Log(imagePath);                                               //the mond file should always be in the same directory as the original csv in a folder called mondrian
-        mondPath = imagePath + "mond.csv";                                      //now we can find the mond csv
+        mondPath = imagePath + "mask.csv";                                      //now we can find the mond csv
         palettePath = imagePath + "colorPalette.csv";
         if (File.Exists(mondPath))
             readMondrians();
         else
         {
             uploadErrorText.GetComponent<Text>().color = Color.red;
-            uploadErrorText.GetComponent<Text>().text = "ERROR:: Mondrian file could not be found. Path... " + mondPath;
+            uploadErrorText.GetComponent<Text>().text = "ERROR:: Noise Mask file could not be found. Path... " + mondPath;
             uploadSuccessfull = false;
         }
 

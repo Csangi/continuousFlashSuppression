@@ -56,6 +56,39 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\LeanTween\Examples\Archived\OldGUIExamplesCS.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Archived\TestingPunch.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Archived\TestingRigidbodyCS.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\Following.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralAdvancedTechniques.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralBasic.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralBasics2d.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralCameraShake.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralEasingTypes.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralEventsListeners.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralSequencer.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralSimpleUI.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\GeneralUISpace.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\LogoCinematic.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathBezier.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathBezier2d.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSpline.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSpline2d.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplineEndless.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplinePerformance.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplineTrack.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\PathSplines.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\TestingUnitTests.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\TestingZLegacy.cs" />
+    <Compile Include="Assets\LeanTween\Examples\Scripts\TestingZLegacyExt.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LTDescr.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LTDescrOptional.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LTSeq.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LeanAudio.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LeanSmooth.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LeanTest.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LeanTween.cs" />
+    <Compile Include="Assets\LeanTween\Framework\LeanTweenExt.cs" />
     <Compile Include="Assets\Oculus\Avatar\Samples\AvatarGallery\Scripts\OvrAvatarTestDriver.cs" />
     <Compile Include="Assets\Oculus\Avatar\Samples\GripPoses\Scripts\PoseEditHelper.cs" />
     <Compile Include="Assets\Oculus\Avatar\Samples\LocalAvatar\Scripts\GazeTargetSpawner.cs" />
@@ -206,6 +239,8 @@
     <Compile Include="Assets\Scenes\ExperimentSpripts\Mondrian.cs" />
     <Compile Include="Assets\Scenes\ExperimentSpripts\createMond.cs" />
     <Compile Include="Assets\Scenes\MondrianCreator\MondrianBuilder.cs" />
+    <Compile Include="Assets\Scenes\MondrianCreator\PaletteAnimation.cs" />
+    <Compile Include="Assets\Scenes\MondrianCreator\SaveMasks.cs" />
     <Compile Include="Assets\Scenes\MondrianCreator\ScreenShot.cs" />
     <Compile Include="Assets\Scenes\SceenManagement\Loading.cs" />
     <Compile Include="Assets\Scenes\SceenManagement\Opening.cs" />
@@ -234,6 +269,7 @@
     <None Include="Assets\Oculus\SampleFramework\Usage\HandsTrainExample\Shaders\ButtonGlow.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\Passthrough\Materials\SelectivePassthrough.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\Passthrough\Materials\SelectivePassthroughSoft.shader" />
+    <None Include="Assets\LeanTween\ReadMe.txt" />
     <None Include="Assets\Oculus\SampleFramework\Usage\DistanceGrab\Materials\CrosshairZCheat.shader" />
     <None Include="Assets\Oculus\Avatar\Resources\Materials\Version1.5\Avatar_Mobile_Loader.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\HandsTrainExample\Shaders\GradientSkybox.shader" />
@@ -244,6 +280,7 @@
     <None Include="Assets\Oculus\Avatar\Resources\Materials\Expressive\AvatarEyeLens.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\Passthrough\Materials\FatFingers.shader" />
     <None Include="Assets\Oculus\Avatar\Resources\Materials\Expressive\Avatar_PC_SingleComponentExpressive.shader" />
+    <None Include="Assets\LeanTween\License.txt" />
     <None Include="Assets\Oculus\SampleFramework\Usage\HandsTrainExample\Shaders\OculusSampleTrainPropsShader.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\DistanceGrab\Materials\ToyCubeWithOutline.shader" />
     <None Include="Assets\Oculus\SampleFramework\Core\Locomotion\Materials\ColumnGlow.shader" />
@@ -260,6 +297,7 @@
     <None Include="Assets\Oculus\Avatar\Resources\Materials\AvatarPBRV2Simple.shader" />
     <None Include="Assets\Oculus\Avatar\Resources\Materials\AvatarSurfaceShaderSelfOccluding.shader" />
     <None Include="Assets\Oculus\SampleFramework\Core\HandsInteraction\Shaders\OculusSampleAlphaHandOutline.shader" />
+    <None Include="Assets\LeanTween\Examples\Archived\2dUnlitWithFade.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\Passthrough\Materials\GlowEffect.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\HandsTrainExample\Shaders\OculusSampleTrainSmokeShader.shader" />
     <None Include="Assets\Oculus\SampleFramework\Usage\OVROverlayCanvas\Shaders\UI Prerendered Opaque.shader" />
