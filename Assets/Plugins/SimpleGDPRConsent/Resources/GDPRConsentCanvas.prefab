@@ -187,8 +187,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Before running this program, you need to accept our Terms of Service and
-    read our Privacy Policy.
+  m_Text: Before running this program, you need to accept our End User Agreement
+    and read our Privacy Policy.
 --- !u!1 &1163280533721250
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,7 +556,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Terms of Service
+  m_Text: End User Agreement
 --- !u!114 &114298628218464350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1472,7 +1472,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Privacy Policy
+  m_Text: Documentation
 --- !u!114 &114642423353391898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1563,7 +1563,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Links to our Partners'' Privacy Policies:
+  m_Text: 'Link to our End User Agreement:
 
 '
 --- !u!1 &1897039110561838
@@ -1643,24 +1643,11 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Thank you for playing our game!
+  m_Text: 'Thank you for using our application!
 
 
-    We aim to enhance your user experience
-    and improve our services using data about you, with your consent.
-
-
-    You have
-    the right to opt out of data collection. Although it negatively affects our services,
-    we respect your decision.
-
-
-    By opting in to data collection, you confirm
-    that you are at least 16 years old.
-
-
-    You can change your choices anytime
-    in the app settings.'
+    Before starting you should
+    take a look at our User Agreement and accept. '
 --- !u!1 &1897494549985828
 GameObject:
   m_ObjectHideFlags: 0

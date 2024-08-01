@@ -244,6 +244,7 @@
     <Compile Include="Assets\Scenes\MondrianCreator\ScreenShot.cs" />
     <Compile Include="Assets\Scenes\SceenManagement\Loading.cs" />
     <Compile Include="Assets\Scenes\SceenManagement\Opening.cs" />
+    <Compile Include="Assets\Scenes\SceenManagement\UserGuideCopier.cs" />
     <Compile Include="Assets\Scenes\Upload\ExperimentOrganization\Block.cs" />
     <Compile Include="Assets\Scenes\Upload\ExperimentOrganization\Condition.cs" />
     <Compile Include="Assets\Scenes\Upload\ExperimentOrganization\Experiment.cs" />

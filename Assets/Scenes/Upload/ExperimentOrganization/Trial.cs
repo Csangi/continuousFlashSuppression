@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
+
 public abstract class Item
 {
     public bool hasMultipleStims { get; private set; }
@@ -9,7 +12,8 @@ public abstract class Item
     public string image2 { get; set; }
     public string image2Path { get; set; }
     public string error { get; set; }
-    public Item(int rand, int blk, string img, bool multi, string img2)
+    public List<string> PassThroughColumns = new List<string>();
+    public Item(int rand, int blk, string img, bool multi, string img2, List<string> passthrough)
     {
         error = "";
         random = rand;
@@ -19,6 +23,7 @@ public abstract class Item
         hasMultipleStims = multi;
         image2 = img2;
         image2Path = "";
+        PassThroughColumns = passthrough;
     }
     public abstract void printTrialToConsole();
     public abstract void simCheck();
@@ -45,7 +50,7 @@ public class MondTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
+    public MondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad, List<string> passthrough) : base(rand, blk, img, multi, img2, passthrough)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -68,21 +73,22 @@ public class MondTrial : Item
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
         if (hasMultipleStims)
         {
-            writer += "MultiMondrianTrial,";
+            writer += "multi_stim_noise_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
             writer += image + "_" + image2 + ",";
         }
         else
         {
-            writer += "MondrianTrial,";
+            writer += "noise_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
             writer += image + ",";
@@ -93,15 +99,20 @@ public class MondTrial : Item
         writer += maskDelay + ",";
         writer += staticDelay + ",";
         writer += mond + ",";
-        if (isResponse)
+        writer += responseTime + ",";
+        writer += up + ",";
+        writer += down + ",";
+        writer += left + ",";
+        writer += right + ",";
+        writer += response + ",";
+        writer += ",";
+        writer += timeToReachOpacity + ",";
+        writer += quadrant + ",";
+        writer += (!responseStop) + ",";
+        writer += DateTime.Now + ",";
+        foreach ( string pass in PassThroughColumns)
         {
-            writer += responseTime + ",";
-            writer += up + ",";
-            writer += down + ",";
-            writer += left + ",";
-            writer += right + ",";
-            writer += response + ",,";
-            writer += (!responseStop) + ",";
+            writer += pass + ",";
         }
         writer += "\n";
         return writer; 
@@ -171,7 +182,7 @@ public class FlashMondTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public FlashMondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
+    public FlashMondTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad, List<string> passthrough) : base(rand, blk, img, multi, img2, passthrough)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -194,21 +205,22 @@ public class FlashMondTrial : Item
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
         if (hasMultipleStims)
         {
-            writer += "MultiMondrianTrial,";
+            writer += "multi_stim_noise_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
             writer += image + "_" + image2 + ",";
         }
         else
         {
-            writer += "MondrianTrial,";
+            writer += "noise_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
             writer += image + ",";
@@ -219,19 +231,22 @@ public class FlashMondTrial : Item
         writer += maskDelay + ",";
         writer += staticDelay + ",";
         writer += mond + ",";
-        if (isResponse)
-        {
-            writer += responseTime + ",";
-            writer += up + ",";
-            writer += down + ",";
-            writer += left + ",";
-            writer += right + ",";
-            writer += response + ",";
-        }
-        else
-            writer += ",,,,,,";
+        writer += responseTime + ",";
+        writer += up + ",";
+        writer += down + ",";
+        writer += left + ",";
+        writer += right + ",";
+        writer += response + ",";
         writer += flashPeriod + ",";
-        writer += (!responseStop) + "\n";
+        writer += timeToReachOpacity + ",";
+        writer += quadrant + ",";
+        writer += (!responseStop) + ",";
+        writer += DateTime.Now + ",";
+        foreach (string pass in PassThroughColumns)
+        {
+            writer += pass + ",";
+        }
+        writer += "\n";
         return writer; 
     }
     //debug print statement for error checking
@@ -304,7 +319,7 @@ public class MaskTrial : Item
     public bool isResponse { get; private set; }  //if the trial takes in reponse
     public bool responseStop { get; private set; }  //if the trial should end after the response is taken in
     //default constructor
-    public MaskTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad) : base(rand, blk, img, multi, img2)
+    public MaskTrial(int rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop, int TTRO, int quad, List<string> passthrough) : base(rand, blk, img, multi, img2, passthrough)
     {
         duration = dur;
         flashDuration = flshdur;
@@ -328,21 +343,22 @@ public class MaskTrial : Item
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
         if (hasMultipleStims)
         {
-            writer += "MultiMaskTrial,";
+            writer += "multi_stim_object_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
-            writer += image + "&" + image2 + ",";
+            writer += image + "_" + image2 + ",";
         }
         else
         {
-            writer += "MaskTrial,";
+            writer += "object_as_mask,";
+            writer += ++counter + ",";
             writer += ++trial + ",";
             writer += random + ",";
             writer += image + ",";
@@ -353,19 +369,22 @@ public class MaskTrial : Item
         writer += maskDelay + ",";
         writer += staticDelay + ",";
         writer += mask + ",";
-        if (isResponse)
-        {
-            writer += responseTime + ",";
-            writer += up + ",";
-            writer += down + ",";
-            writer += left + ",";
-            writer += right + ",";
-            writer += response + ",";
-        }
-        else
-            writer += ",,,,,,";
+        writer += responseTime + ",";
+        writer += up + ",";
+        writer += down + ",";
+        writer += left + ",";
+        writer += right + ",";
+        writer += response + ",";
         writer += flashPeriod + ",";
-        writer += (!responseStop) + "\n";
+        writer += timeToReachOpacity + ",";
+        writer += quadrant + ",";
+        writer += (!responseStop) + ",";
+        writer += DateTime.Now + ",";
+        foreach (string pass in PassThroughColumns)
+        {
+            writer += pass + ",";
+        }
+        writer += "\n";
         return writer; 
     }
     public override void printTrialToConsole()
@@ -420,7 +439,7 @@ public class Instruction : Item
 {
     public int duration;
     public float responseTime;
-    public Instruction(int rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
+    public Instruction(int rand, int blk, string img, int dur, List<string> passThrough) : base(rand, blk, img, false, "", passThrough)
     {
         duration = dur;
         responseTime = 0;
@@ -428,17 +447,25 @@ public class Instruction : Item
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
-        writer += "Instruction,";
+        writer += "instruction,";
+        writer += ++counter + ",";
         writer += ++trial + ",";
         writer += random + ",";
         writer += image + ",";
-        writer += duration + ",,,,,,";
-        writer += responseTime + ",\n";
+        writer += duration + ",";
+        writer += ",,,,,";
+        writer += responseTime + ",";
+        writer += ",,,,,,,,,";
+        writer += DateTime.Now + ",";
+        foreach (string pass in PassThroughColumns)
+        {
+            writer += pass + ",";
+        }
+        writer += "\n";
         return writer; 
     }
     public override void printTrialToConsole()
@@ -463,7 +490,7 @@ public class Response : Item
 {
     public string up, down, left, right, response;
     public float responseTime;
-    public Response(int rand, int blk, string img, string u, string d, string l, string r) : base(rand, blk, img, false, "")
+    public Response(int rand, int blk, string img, string u, string d, string l, string r, List<string> passThrough) : base(rand, blk, img, false, "", passThrough)
     {
         up = u;
         down = d;
@@ -475,12 +502,12 @@ public class Response : Item
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
-        writer += "Response,";
+        writer += "response,";
+        writer += ++counter + ",";
         writer += ++trial + ",";
         writer += random + ",";
         writer += image + ",,,,,,,";
@@ -489,7 +516,14 @@ public class Response : Item
         writer += down + ",";
         writer += left + ",";
         writer += right + ",";
-        writer += response + ",\n";
+        writer += response + ",";
+        writer += ",,,,";
+        writer += DateTime.Now.ToString() + ",";
+        foreach (string pass in PassThroughColumns)
+        {
+            writer += pass + ",";
+        }
+        writer += "\n";
         return writer;
     }
     public override void printTrialToConsole()
@@ -515,23 +549,30 @@ public class Response : Item
 public class Break : Item
 {
     public int duration;
-    public Break(int rand, int blk, string img, int dur) : base(rand, blk, img, false, "")
+    public Break(int rand, int blk, string img, int dur, List<string> passThrough) : base(rand, blk, img, false, "", passThrough)
     {
         duration = dur;
     }
     public override string printTrial(int cond, bool condRand, int blk, bool blkRand, int trial, int counter)
     {
         string writer = "";
-        writer += ++counter + ",";
         writer += ++cond + ",";
         writer += condRand + ",";
         writer += ++blk + ",";
         writer += blkRand + ",";
-        writer += "Break,";
+        writer += "break,";
+        writer += ++counter + ",";
         writer += ++trial + ",";
         writer += random + ",";
         writer += image + ",";
-        writer += duration + ",\n";
+        writer += duration + ",";
+        writer += ",,,,,,,,,,,,,,,";
+        writer += DateTime.Now + ",";
+        foreach (string pass in PassThroughColumns)
+        {
+            writer += pass + ",";
+        }
+        writer += "\n";
         return writer; 
     }
     public override void printTrialToConsole()

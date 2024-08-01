@@ -43,6 +43,8 @@ ScriptsOnlyBuild:
     Unity.XR.Oculus.dll:
     - Unity.XR.Oculus.OculusLoader
     - Unity.XR.Oculus.OculusSettings
+    Unity.XR.WindowsMixedReality.Editor.dll:
+    - UnityEditor.XR.WindowsMR.WindowsMRPackageSettings
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
     - UnityEditor.TestTools.TestRunner.TestListCacheData
@@ -86,6 +88,8 @@ ScriptsOnlyBuild:
     - Class: 48
       Script: {instanceID: 0}
     - Class: 81
+      Script: {instanceID: 0}
+    - Class: 89
       Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
@@ -147,6 +151,8 @@ ScriptsOnlyBuild:
     - Class: 48
       Script: {instanceID: 0}
     - Class: 81
+      Script: {instanceID: 0}
+    - Class: 89
       Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
@@ -240,6 +246,8 @@ ScriptsOnlyBuild:
     - Class: 83
       Script: {instanceID: 0}
     - Class: 84
+      Script: {instanceID: 0}
+    - Class: 89
       Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
@@ -354,8 +362,6 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
-    - Class: 89
-      Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
     - Class: 108
@@ -422,6 +428,8 @@ ScriptsOnlyBuild:
     - Class: 81
       Script: {instanceID: 0}
     - Class: 84
+      Script: {instanceID: 0}
+    - Class: 89
       Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
@@ -1448,7 +1456,7 @@ ScriptsOnlyBuild:
     className: OVRMesh
   - hash:
       serializedVersion: 2
-      Hash: 89bd6ac837157b33f8a60c0d6fc0c95f
+      Hash: c1fc98afead2ce18bcdde1f8aa909644
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: UIManager
@@ -2414,7 +2422,7 @@ ScriptsOnlyBuild:
     className: HIDDescriptorWindow
   - hash:
       serializedVersion: 2
-      Hash: 9c9aecb63b5d67a6b26dccf8337ed13b
+      Hash: 4a3e687cab1d394be284c09af34f2a3b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Opening
@@ -3972,6 +3980,12 @@ ScriptsOnlyBuild:
     assemblyName: Oculus.Interaction.dll
     namespaceName: Oculus.Interaction.Input
     className: FromOVRControllerHandDataSource
+  - hash:
+      serializedVersion: 2
+      Hash: 704f424815d889db976366ce943d8b80
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: UserGuideCopier
   platform: 19
   scenePathNames:
   - Assets/Scenes/Opening.unity
@@ -3979,4 +3993,4 @@ ScriptsOnlyBuild:
   - Assets/Scenes/creator.unity
   - Assets/Scenes/LoadingScreen.unity
   - Assets/Scenes/exp.unity
-  playerPath: C:/Users/csang/Desktop/CFSVRBuild/CFS-VR.exe
+  playerPath: C:/Users/csang/Desktop/CFSVRBuild/CFS-VR/CFS-VR.exe

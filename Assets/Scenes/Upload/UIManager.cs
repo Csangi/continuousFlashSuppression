@@ -42,10 +42,10 @@ public class UIManager : MonoBehaviour
     public GameObject conditionOrderTextDisplay;
     public GameObject uploadErrorText;
     public GameObject outputPathErrorText;
+    public GameObject simulateOutputText;
 
     private void starting()
     {
-        Debug.Log("Waiting HERE AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         if (experiment.hasUploaded)
             returnedFromExp();
 
@@ -145,7 +145,7 @@ public class UIManager : MonoBehaviour
             StartGame();
     }
 
-            private void returnedFromExp()
+    private void returnedFromExp()
     {
         if (experiment.successfulUpload)
         {
@@ -184,7 +184,6 @@ public class UIManager : MonoBehaviour
             idTextDisplay.GetComponent<Text>().color = Color.white;
             idTextDisplay.GetComponent<Text>().text = experiment.ID;
         }
-        //experiment.printExperiment();
     }
 
     //---------------------------------------------------Upload caller------------------------------------------------------------------------------
@@ -263,10 +262,11 @@ public class UIManager : MonoBehaviour
         int flashing = 0;          //the time the flashing image is off the screen
         string img2 = "";
         bool responseStop = true;
+        List<string> passThroughCol = new List<string>();
         int quadrant = 0;
         int TTRO = -1;
-        experiment.paletteUploadNeeded = false; 
-
+        experiment.paletteUploadNeeded = false;
+        experiment.count = 0;
         path = holderPath;
         Debug.Log(path);
         experiment.inputPath = path;
@@ -317,11 +317,11 @@ public class UIManager : MonoBehaviour
                                             {
                                                 case 0:
                                                     //Instruction(bool rand, int blk, Version type, string img, string imgpth, int dur)
-                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Instruction(trialRand, block0, img, duration));
+                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Instruction(trialRand, block0, img, duration, passThroughCol));
                                                     break;
                                                 case 1:
                                                     //Break(bool rand, int blk, Version type, string img, int dur)
-                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Break(trialRand, block0, img, duration));
+                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Break(trialRand, block0, img, duration, passThroughCol));
                                                     break;
                                                 case 2:
                                                     //Response(bool rand, int blk, Version type, string img, string u, string d, string l, string r)
@@ -329,44 +329,44 @@ public class UIManager : MonoBehaviour
                                                     {
                                                         up = "up"; down = "down"; left = "left"; right = "right";
                                                     }
-                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Response(trialRand, block0, img, up, down, left, right));
+                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Response(trialRand, block0, img, up, down, left, right, passThroughCol));
                                                     //if values are not uploaded for the responses these will be the default values entered
                                                     break;
                                                 case 3:     //mondTrials
                                                     if (flashing == 0)
                                                     {
                                                         //MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     }
                                                     else
                                                     {
                                                         //FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     }
                                                     break;
                                                 case 4:
                                                     //MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
                                                     if (flashing == 0)
                                                         flashing = (int)Math.Round(flash * 0.1f);
-                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     break;
                                                 case 5:     //multi mond trials
                                                     if (flashing == 0)
                                                     {
                                                         //MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     }
                                                     else
                                                     {
                                                         //FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     }
                                                     break;
                                                 case 6:
                                                     //MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
                                                     if (flashing == 0)
                                                         flashing = (int)Math.Round(flash * 0.1f);
-                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                                                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                                                     break;
                                             }
                                             experiment.count++;
@@ -377,6 +377,7 @@ public class UIManager : MonoBehaviour
                                             mond = "0";
                                             quadrant = 0;
                                             TTRO = -1;
+                                            passThroughCol = new List<string>();
                                         }
                                         if (result != numberCondition + 1)      //if the next trial is not the same condition as the privious trial
                                         {                                       //we will add a new condition (we add one because everything is uploaded counting from 1 and not 0
@@ -485,6 +486,9 @@ public class UIManager : MonoBehaviour
                                     case 21:
                                         responseStop = !Convert.ToBoolean(result);
                                         break;
+                                    default:
+                                        passThroughCol.Add(values[i]);
+                                        break;
                                 }
                             }
                         }
@@ -500,11 +504,11 @@ public class UIManager : MonoBehaviour
             {
                 case 0:
                     //Instruction(bool rand, int blk, Version type, string img, string imgpth, int dur)
-                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Instruction(trialRand, block0, img, duration));
+                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Instruction(trialRand, block0, img, duration, passThroughCol));
                     break;
                 case 1:
                     //Break(bool rand, int blk, Version type, string img, int dur)
-                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Break(trialRand, block0, img, duration));
+                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Break(trialRand, block0, img, duration, passThroughCol));
                     break;
                 case 2:
                     //Response(bool rand, int blk, Version type, string img, string u, string d, string l, string r)
@@ -512,44 +516,44 @@ public class UIManager : MonoBehaviour
                     {
                         up = "up"; down = "down"; left = "left"; right = "right";
                     }
-                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Response(trialRand, block0, img, up, down, left, right));
+                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new Response(trialRand, block0, img, up, down, left, right, passThroughCol));
                     //if values are not uploaded for the responses these will be the default values entered
                     break;
                 case 3:     //mondTrials
                     if (flashing == 0)
                     {
                         //MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     }
                     else
                     {
                         //FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     }
                     break;
                 case 4:
                     //MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
                     if (flashing == 0)
                         flashing = (int)Math.Round(flash * 0.1f);
-                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant));
+                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, false, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, "", up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     break;
                 case 5:     //multi mond trials
                     if (flashing == 0)
                     {
                         //MondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     }
                     else
                     {
                         //FlashMondTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, int mond, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
-                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                        experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new FlashMondTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mond, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     }
                     break;
                 case 6:
                     //MaskTrial(bool rand, int blk, string img, bool multi, int dur, int flshdur, float opa, int mskdly, int stcdly, string mask, float flash, string img2, string u, string d, string l, string r, bool resp, bool stop) : base(rand, blk, img, multi, img2)
                     if (flashing == 0)
                         flashing = (int)Math.Round(flash * 0.1f);
-                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant));
+                    experiment.conditions[numberCondition].blocks[numberBlock].addTrial(new MaskTrial(trialRand, block0, img, true, duration, flash, opacity, maskDelay, staticDelay, mask, flashing, img2, up, down, left, right, response, responseStop, TTRO, quadrant, passThroughCol));
                     break;
             }
             //experiment.count++;
@@ -595,16 +599,17 @@ public class UIManager : MonoBehaviour
 
     public void simulateTrials()
     {
+        int numOfErrors = 0;
         int conditionIndex = 0, blockIndex = 0, trialIndex = 0, counter = 0;
         string fileName = "";
         if (experiment.outputPath != string.Empty)
-            fileName = experiment.outputPath + "/" + experiment.ID + ".csv";
+            fileName = experiment.outputPath + "/" + experiment.ID + "_Simulate" + ".csv";
         else
-            fileName = experiment.csvOriginDirectory + "/" + experiment.ID + ".csv";
+            fileName = experiment.csvOriginDirectory + "/" + experiment.ID + "_Simulate" + ".csv";
 
         using (StreamWriter writer = File.AppendText(fileName))
         {
-            writer.Write("ERROR,Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mask,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
+            writer.Write("error,condition,condition_randomization,block,block_randomization,trial_type,trial_count,trial_input,trial_randomization,static_image,duration,flash_duration,opacity,mask_delay,static_delay,mask,response_time,up,down,left,right,answer,blank_period,time_to_reach_opacity,location,multi_response,time_of_writing,pass_through\n");
             for (int i = 0; i < experiment.numberOfConditions; ++i)
             {
                 conditionIndex = experiment.index[i];
@@ -617,10 +622,21 @@ public class UIManager : MonoBehaviour
                         experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].simCheck();
                         writer.Write(experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].error + "," +
                             experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].printTrial(conditionIndex, experiment.conditions[conditionIndex].random, blockIndex, experiment.conditions[conditionIndex].blocks[blockIndex].random, trialIndex, counter) );
+                        numOfErrors += string.Empty == experiment.conditions[conditionIndex].blocks[blockIndex].trials[trialIndex].error? 0:1;
                     }
                 }
             }
             writer.Close();
+        }
+        if(numOfErrors == 0)
+        {
+            simulateOutputText.GetComponent<Text>().text = "Simulation complete with no errors. ";
+            simulateOutputText.GetComponent<Text>().color = Color.white;
+        }
+        else
+        {
+            simulateOutputText.GetComponent<Text>().text = "Simulation complete with " + numOfErrors + " errors ";
+            simulateOutputText.GetComponent<Text>().color = Color.red;
         }
     }
 

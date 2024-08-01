@@ -1067,7 +1067,7 @@ public class ExperimentRunner : MonoBehaviour
         {
             if (!writerStart)
             {
-                writer.Write("Trial Count,Condition,Cond Rand,Block,Block Rand,Trial Type,Input Order,Trial Rand,Image,Duration,Flash Duration,Opacity,Mask Delay,Static Delay,Mask,Response Time,Up,Down,Left,Right,Answer,Flash period,Multi Response\n");
+                writer.Write("condition,condition_randomization,block,block_randomization,trial_type,trial_count,trial_input,trial_randomization,static_image,duration,flash_duration,opacity,mask_delay,static_delay,mask,response_time,up,down,left,right,answer,blank_period,time_to_reach_opacity,location,multi_response,time_of_writing,pass_through\n");
                 writerStart = true;
             }
             writer.Write(IT.printTrial(cond, condRand, blk, blkRand, trial, counter));
