@@ -149,7 +149,7 @@ public class MondrianBuilder : MonoBehaviour
                 using (System.IO.StreamWriter writer = new System.IO.StreamWriter(palettePath, true))
                 {
                     string itemToWrite = "";
-                    if(nameOfNewPalette == String.Empty || colorPalettenames.Count(n => n == nameOfNewPalette) > 0)
+                    if(nameOfNewPalette == String.Empty)
                         itemToWrite += "New Palette " + (colors.Count + 1) + ","; 
                     else
                         itemToWrite += nameOfNewPalette + ",";
@@ -580,7 +580,7 @@ public class MondrianBuilder : MonoBehaviour
         else
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "No Mask was drawn. (Make sure to upload a folder)";
+            errorText.GetComponent<Text>().text = "No Mask files were written. (Make sure to upload a folder destination)";
         }
     }
 
@@ -753,12 +753,12 @@ public class MondrianBuilder : MonoBehaviour
             MondList.Add(new Mondrian(palette, shape, pix, minW, maxW, minH, maxH, Density));
             maskDropdown.options.Add(new Dropdown.OptionData(key));
             errorText.GetComponent<Text>().color = Color.white;
-            errorText.GetComponent<Text>().text = "Mond file uploaded";
+            errorText.GetComponent<Text>().text = "Mask file uploaded";
         }
         else
         {
             errorText.GetComponent<Text>().color = Color.red;
-            errorText.GetComponent<Text>().text = "Could not find Mond file. ";
+            errorText.GetComponent<Text>().text = "Could not find Mask file. ";
         }
     }
 

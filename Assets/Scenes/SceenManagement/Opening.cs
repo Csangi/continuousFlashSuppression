@@ -9,8 +9,10 @@ public class Opening : MonoBehaviour
 {
     public Experiment experiment = Experiment.current; //= Experiment.current;
     public GameObject cmdTestingInput;
+    public string DocumentationURL;
     public void Start()
     {
+        Application.targetFrameRate = 60;
         string[] args = System.Environment.GetCommandLineArgs();
         if (args.Length > 1 && args.Length <= 6 && !experiment.hasUploaded)
         {
@@ -133,12 +135,17 @@ public class Opening : MonoBehaviour
     public void openTOS()
     {
         SimpleGDPR.ShowDialog(new TermsOfServiceDialog().
-                SetTermsOfServiceLink("https://policies.google.com/terms?hl=en-US").
-                SetPrivacyPolicyLink("https://policies.google.com/privacy?hl=en-US"),
+                SetTermsOfServiceLink("https://www.marchlab.org/cfs-vr/enduseragreement").
+                SetPrivacyPolicyLink("https://www.marchlab.org/cfs-vr"),
                 onMenuClosed);
     }
     private void onMenuClosed()
     {
         Debug.LogWarning("Nothing, Terms of Service already accepted");
+    }
+
+    public void OpenDocumentation()
+    {
+        Application.OpenURL(DocumentationURL);
     }
 }
