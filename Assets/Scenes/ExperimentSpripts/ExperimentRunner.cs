@@ -15,6 +15,7 @@ public class ExperimentRunner : MonoBehaviour
     public Experiment exp = Experiment.current;
     public Image progress;
     public GameObject progressText;
+    public Text spaceBarText;
 
     //our 2 raw image arrays corrisponding to the 2 image arrays in the project
     public RawImage[] rightImgArr;
@@ -190,6 +191,8 @@ public class ExperimentRunner : MonoBehaviour
         expIsRunning = true;
         int counter = 0;
         int conditionIndex = 0, blockIndex = 0, trialIndex = 0;
+        spaceBarText.gameObject.SetActive(!expIsRunning);
+
         for (int i = 0; i < exp.numberOfConditions; ++i)
         {
             conditionIndex = exp.index[i];
@@ -330,6 +333,7 @@ public class ExperimentRunner : MonoBehaviour
             }
         }
         expIsRunning = false;
+        spaceBarText.gameObject.SetActive(!expIsRunning);
     }
 
     //this funciton changes the location of the image to the quadrant of the user's choosing
