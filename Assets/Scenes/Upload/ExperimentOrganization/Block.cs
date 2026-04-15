@@ -27,11 +27,10 @@ public class Block
     public void randomizeTrials()                                 //function to randomize trials given whether they were supposed to be randomized                          
     {
         int x, holder;
-        Debug.Log("We in this bitch 1");
         if (numberOfTrials > 1)
             for (int i = 0; i < numberOfTrials; i++)                      //loop through the array of trials                                                                        
             {//Make a random variable x that has a range between 0 and number of trials -1 (-1 because index starts at 0) and makes a new random number every loop
-                Debug.Log("We in this bitch 2");
+                
                 if (this.trials[i].random != 0)//if the trial was set to be randomized and is a version trial                                            
                 {
                     do
