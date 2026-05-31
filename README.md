@@ -5,63 +5,65 @@ Commissioned by Dr. David March (https://psy.fsu.edu/faculty/marchd/march.dp.php
 
 **Important Info**
 
-Use 1 for true and 0 for false. 
+WARNING: If opening in Unity without a Meta VR headset attached you'll get a lot of errors from Unity trying to find a headset, these can be ignored everything will run just fine. They are errors coming from Unity plugins and nothing that will interupt the runtime of the program. Testing within Unity or Desktop application before testing on a headset is advised.
+
+Use 1 for true and 0 for false.
 
 All CSV cells must be filled! Instruction cells can be filled with 0 as needed.
 
 CSV file order:
 
-!!  First header line will be ignored  !!
+!! First header line will be ignored !!
 
-  1. Condition
-  2. Condition Random
-  3. Block
-  4. Block Random
-  5. Trial type
-  6. Trial
-  7. Trial Random
-  8. Image
-  9. Duration(ms)
-  10. Flash Duration(ms)
-  11. Opacity(%)
-  12. Mask Delay(ms)
-  13. Static Delay(ms)
-  14. Masks (optional)
-    *for response input*
-  15. UP (optional)
-  16. DOWN (optional)
-  17. Left (optional)
-  18. Right (optional)
-  19. Flash Period(ms) (optional)
+1. Condition
+2. Condition Random
+3. Block
+4. Block Random
+5. Trial type
+6. Trial
+7. Trial Random
+8. Image
+9. Duration(ms)
+10. Flash Duration(ms)
+11. Opacity(%)
+12. Mask Delay(ms)
+13. Static Delay(ms)
+14. Masks (optional)
+    _for response input_
+15. UP (optional)
+16. DOWN (optional)
+17. Left (optional)
+18. Right (optional)
+19. Flash Period(ms) (optional)
 
-*Uploading images*
+_Uploading images_
 
-!!  All images must be in a folder named "Static" in the same directory as the uploaded experiement file  !!
+!! All images must be in a folder named "Static" in the same directory as the uploaded experiement file !!
 
-The images used in the expirement must be uploaded in the csv. The program does not provide any images to the user aside from pregenerated mondrians. 
+The images used in the expirement must be uploaded in the csv. The program does not provide any images to the user aside from pregenerated mondrians.
 
-  In the csv the user will state the name of a image file which they wish to use 
-  or 
-  They can list a text file containing the names of multiple image files, which should be found in the same "Static" folder, predesignated with a symbol refering to the type of input shown below. (no spaces)
-  
+In the csv the user will state the name of a image file which they wish to use
+or
+They can list a text file containing the names of multiple image files, which should be found in the same "Static" folder, predesignated with a symbol refering to the type of input shown below. (no spaces)
+
     *Randomization types*
       # = pull from the list in the order it’s presented
       $ = pull randomly from the list without replacement
       & = pull randomly from the list with replacement
-  
-*Creating Mondrians* (optional)
 
-!!  Mond.csv must be the name of your file and must be in the same directory as the originally uploaded csv  !!
+_Creating Mondrians_ (optional)
 
-  You can use the mondrian creator in the program to get a feel for your mondrian.
-  Once you have found the mondrian or mondrians you wish to use add them to the mond csv and specify them in the Mask column of your upload
-  
+!! Mond.csv must be the name of your file and must be in the same directory as the originally uploaded csv !!
+
+You can use the mondrian creator in the program to get a feel for your mondrian.
+Once you have found the mondrian or mondrians you wish to use add them to the mond csv and specify them in the Mask column of your upload
+
     -Mond.csv
-    
+
     !!  First row is ignored  !!
-    
+
       CSV file order:
-      
+
       1. Number Mondrian
       2. Palette
       3. Shape
@@ -78,12 +80,12 @@ The images used in the expirement must be uploaded in the csv. The program does 
       7. Minimum height
       8. Maximum height
       9. Density
-  
-  *Uploading Color Palettes* (optional)
-  
-  !!  colorPalette.csv must be the name of your file and must be in the same directory as the originally uploaded csv  !!
-  
+
+_Uploading Color Palettes_ (optional)
+
+!! colorPalette.csv must be the name of your file and must be in the same directory as the originally uploaded csv !!
+
     If you wish to use your own color palettes for your mondrians you can upload them in the colorPalette csv
      -colorPalette.csv
-      In colorPalette.csv you will type the RGB color values of your colors sequentially in a row per every palette. 
-      The header row will be ignored and the first column is also ignored for numbering. Every row is a new palette and every 3 columns is a color. 
+      In colorPalette.csv you will type the RGB color values of your colors sequentially in a row per every palette.
+      The header row will be ignored and the first column is also ignored for numbering. Every row is a new palette and every 3 columns is a color.
